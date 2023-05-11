@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Licenta</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="passwordRegex">Password must have a minimum of eight characters, at least one uppercase letter, one lowercase letter, one number and one special character</string>
 </resources>
