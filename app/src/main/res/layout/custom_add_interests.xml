@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/interest_tag"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/button_style">
+    <TextView
+        android:id="@+id/text_interest_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="PlaceholderText"
+        android:textStyle="bold" />
+
+    <ImageButton
+        android:id="@+id/remove_button_interest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:layout_toEndOf="@+id/text_interest_name"
+        android:background="@drawable/button_style"
+        android:src="@drawable/close_icon" />
+
+
+</RelativeLayout>

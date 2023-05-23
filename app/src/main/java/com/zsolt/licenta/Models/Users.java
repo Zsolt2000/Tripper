@@ -1,35 +1,44 @@
 package com.zsolt.licenta.Models;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import android.media.Image;
+import android.net.Uri;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 public class Users {
+
+
+    private String uid;
     private String name;
     private String phoneNumber;
     private int age;
-    private Date dateOfBirth;
+    private String dateOfBirth;
     private String homeLocation;
     private List<Interests> interests;
-    private ProfileStatus profileStatus;
+
     private HashMap<Integer, Trips> tripsHashMap;
 
-    public Users(String name, String phoneNumber, int age, Date dateOfBirth, String homeLocation, List<Interests> interests, ProfileStatus profileStatus, HashMap<Integer, Trips> tripsHashMap) {
+    private Gender gender;
+
+    private String profileImage;
+
+    public Users() {
+    }
+
+    public Users(String uid,String name, String phoneNumber, int age, String dateOfBirth, String homeLocation, List<Interests> interests, HashMap<Integer, Trips> tripsHashMap, String profileImage, Gender gender) {
+        this.uid=uid;
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.age = age;
         this.dateOfBirth = dateOfBirth;
         this.homeLocation = homeLocation;
-        this.interests = new ArrayList<Interests>();
-        this.profileStatus = profileStatus;
-        this.tripsHashMap = new HashMap<Integer,Trips>();
+        this.interests = interests;
+        this.tripsHashMap = new HashMap<>();
+        this.gender = gender;
+        this.profileImage=profileImage;
     }
 
 
@@ -57,11 +66,11 @@ public class Users {
         this.age = age;
     }
 
-    public Date getDateOfBirth() {
+    public String getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(Date dateOfBirth) {
+    public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -81,13 +90,6 @@ public class Users {
         this.interests = interests;
     }
 
-    public ProfileStatus getProfileStatus() {
-        return profileStatus;
-    }
-
-    public void setProfileStatus(ProfileStatus profileStatus) {
-        this.profileStatus = profileStatus;
-    }
 
     public HashMap<Integer, Trips> getTripsHashMap() {
         return tripsHashMap;
@@ -95,5 +97,45 @@ public class Users {
 
     public void setTripsHashMap(HashMap<Integer, Trips> tripsHashMap) {
         this.tripsHashMap = tripsHashMap;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    @Override
+    public String toString() {
+        return "Users{" +
+                "uid='" + uid + '\'' +
+                ", name='" + name + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", age=" + age +
+                ", dateOfBirth='" + dateOfBirth + '\'' +
+                ", homeLocation='" + homeLocation + '\'' +
+                ", interests=" + interests +
+                ", tripsHashMap=" + tripsHashMap +
+                ", gender=" + gender +
+                ", profileImage='" + profileImage + '\'' +
+                '}';
     }
 }

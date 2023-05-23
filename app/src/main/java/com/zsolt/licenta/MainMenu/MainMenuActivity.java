@@ -18,6 +18,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.zsolt.licenta.Login.LoginActivity;
 import com.zsolt.licenta.R;
 
@@ -42,6 +43,7 @@ public class MainMenuActivity extends AppCompatActivity{
         addTrips();
         navigationDrawerSelection();
         bottomNavigationSelection();
+
 
         getSupportFragmentManager().beginTransaction().add(R.id.frameLayoutMain, new HomeFragment()).commit();
 
