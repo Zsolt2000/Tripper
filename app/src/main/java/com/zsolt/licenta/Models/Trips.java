@@ -4,11 +4,11 @@ import java.util.Date;
 import java.util.List;
 
 public class Trips {
-    private String TripName;
-    private Users TripCreator;
-    private Date StartDate;
-    private Date EndDate;
-    private List<Users> InvitedUsers;
-
+    private String title;
+    private Users creator;
+    private Date startDate;
+    private int numberOfPeople;
+    private String location;
+    private List<Users> invitedUsers;
 
 }

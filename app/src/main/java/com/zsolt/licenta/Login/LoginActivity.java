@@ -1,38 +1,27 @@
 package com.zsolt.licenta.Login;
 
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Patterns;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.zsolt.licenta.MainMenu.MainMenuActivity;
-import com.zsolt.licenta.Models.Gender;
-import com.zsolt.licenta.Models.Interests;
 import com.zsolt.licenta.R;
-import com.zsolt.licenta.ViewHolders.InterestsAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText editEmail, editPassword;
     private Button buttonLogin, buttonSignUp;
     private TextView textForgotPassword;
-    private FirebaseAuth auth;
-    private FirebaseUser currentUser;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
     private Toolbar toolbar;
 
     @Override
@@ -43,9 +32,8 @@ public class LoginActivity extends AppCompatActivity {
         login();
         signUp();
         forgotPassword();
-
         setSupportActionBar(toolbar);
-        auth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
     }
 
     private void forgotPassword() {
@@ -58,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
             } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 editEmail.setError("Please enter a valid email");
             } else {
-                auth.fetchSignInMethodsForEmail(email).addOnCompleteListener(task -> {
+                firebaseAuth.fetchSignInMethodsForEmail(email).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         passwordReset(email);
                     }
@@ -79,8 +67,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        currentUser = auth.getCurrentUser();
-        if (currentUser != null) {
+        firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser != null) {
             Intent mainActivity = new Intent(LoginActivity.this, MainMenuActivity.class);
             startActivity(mainActivity);
             finish();
@@ -104,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
                 editEmail.setError("This field can't be empty");
                 editPassword.setError("This field can't be empty");
             } else {
-                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(LoginActivity.this, "Successful login", Toast.LENGTH_SHORT).show();
                         Intent mainActivity = new Intent(LoginActivity.this, MainMenuActivity.class);
@@ -120,7 +108,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void passwordReset(String email) {
 
-        auth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
+        firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Toast.makeText(LoginActivity.this, "An Email has been sent to reset your password", Toast.LENGTH_SHORT).show();
             } else {

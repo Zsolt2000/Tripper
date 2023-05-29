@@ -17,7 +17,7 @@ public class InterestsAdapter extends RecyclerView.Adapter<InterestsViewHolder> 
     private View itemView;
 
     public InterestsAdapter(List<Interests> interests) {
-        interestsList = interests;
+        this.interestsList = interests;
     }
 
     @NonNull
@@ -41,10 +41,6 @@ public class InterestsAdapter extends RecyclerView.Adapter<InterestsViewHolder> 
     @Override
     public int getItemCount() {
         return interestsList.size();
-    }
-
-    public Interests getItem(int position) {
-        return interestsList.get(position);
     }
 
 }

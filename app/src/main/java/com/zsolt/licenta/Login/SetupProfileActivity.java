@@ -106,17 +106,20 @@ public class SetupProfileActivity extends AppCompatActivity {
         setupDateOfBirth();
         setupLocation();
         setupInterests();
-        getApiKey();
         setupProfile();
+        setupFirebase();
+        getApiKey();
+        profileImage.setOnClickListener(view -> openGallery.launch("image/*"));
+
+
+    }
+
+    private void setupFirebase() {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
         databaseReference = firebaseDatabase.getReference();
         storageReference = firebaseStorage.getReference();
-
-        profileImage.setOnClickListener(view -> openGallery.launch("image/*"));
-
-
     }
 
     private void setupProfile() {
@@ -139,7 +142,7 @@ public class SetupProfileActivity extends AppCompatActivity {
                     });
                 }
                 Users user = new Users(uid, name, phoneNumber, age, dateOfBirth, location, interestsList, trips, imageName, gender);
-                databaseReference.child("Users").child(user.getName()).setValue(user).addOnSuccessListener(unused -> {
+                databaseReference.child("Users").child(user.getUid()).setValue(user).addOnSuccessListener(unused -> {
                     Toast.makeText(this, "Successfully created your profile", Toast.LENGTH_SHORT).show();
                     Intent mainActivity=new Intent(SetupProfileActivity.this,MainMenuActivity.class);
                     startActivity(mainActivity);

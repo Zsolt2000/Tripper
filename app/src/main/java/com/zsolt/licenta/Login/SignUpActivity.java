@@ -24,7 +24,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     private TextView editEmailSignUp, editPasswordSignUp, editRepeatPasswordSignUp;
     private Button buttonSignUp;
-    private FirebaseAuth auth;
+    private FirebaseAuth firebaseAuth;
     private ActionBar actionBar;
     private Toolbar toolbar;
 
@@ -32,7 +32,7 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        auth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
         setupViews();
         signUp();
         setupActionBar();
@@ -53,7 +53,7 @@ public class SignUpActivity extends AppCompatActivity {
             password = editPasswordSignUp.getText().toString();
             repeatPassword = editRepeatPasswordSignUp.getText().toString();
             if (validCredentials(email, password, repeatPassword)) {
-                auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
+                firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(SignUpActivity.this, "Account created successfully", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(SignUpActivity.this, WelcomeUsersActivity.class);

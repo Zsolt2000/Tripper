@@ -68,7 +68,7 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:backgroundTint="@color/app_color"
-            android:contentDescription=""
+            android:contentDescription="Add Trip"
             app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/trips_icon" />
