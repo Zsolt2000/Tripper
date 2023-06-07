@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.zsolt.licenta.CustomViews.AddFriendDialogFragment;
 import com.zsolt.licenta.Models.Interests;
 import com.zsolt.licenta.R;
 
@@ -42,5 +43,8 @@ public class InterestsAdapter extends RecyclerView.Adapter<InterestsViewHolder> 
     public int getItemCount() {
         return interestsList.size();
     }
+
+
+
 
 }

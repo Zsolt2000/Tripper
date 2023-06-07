@@ -3,10 +3,13 @@ package com.zsolt.licenta.Models;
 import android.media.Image;
 import android.net.Uri;
 
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class Users {
 
@@ -28,8 +31,8 @@ public class Users {
     public Users() {
     }
 
-    public Users(String uid,String name, String phoneNumber, int age, String dateOfBirth, String homeLocation, List<Interests> interests, HashMap<Integer, Trips> tripsHashMap, String profileImage, Gender gender) {
-        this.uid=uid;
+    public Users(String uid, String name, String phoneNumber, int age, String dateOfBirth, String homeLocation, List<Interests> interests, HashMap<Integer, Trips> tripsHashMap, String profileImage, Gender gender) {
+        this.uid = uid;
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.age = age;
@@ -38,7 +41,7 @@ public class Users {
         this.interests = interests;
         this.tripsHashMap = new HashMap<>();
         this.gender = gender;
-        this.profileImage=profileImage;
+        this.profileImage = profileImage;
     }
 
 
@@ -137,5 +140,20 @@ public class Users {
                 ", gender=" + gender +
                 ", profileImage='" + profileImage + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        Users user = (Users) obj;
+        return Objects.equals(uid, user.uid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uid);
     }
 }

@@ -37,6 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.zsolt.licenta.Activities.PersonalProfileActivity;
 import com.zsolt.licenta.Login.LoginActivity;
 import com.zsolt.licenta.R;
 import com.zsolt.licenta.Models.Users;
@@ -151,7 +152,8 @@ public class MainMenuActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_profile:
-                    Toast.makeText(getApplicationContext(), "Profile was pressed", Toast.LENGTH_SHORT).show();
+                    Intent profileActivity=new Intent(MainMenuActivity.this, PersonalProfileActivity.class);
+                    startActivity(profileActivity);
                     break;
                 case R.id.nav_trips:
                     Toast.makeText(getApplicationContext(), "Your trips was pressed", Toast.LENGTH_SHORT).show();

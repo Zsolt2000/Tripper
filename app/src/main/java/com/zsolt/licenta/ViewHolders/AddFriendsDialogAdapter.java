@@ -11,20 +11,20 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.zsolt.licenta.Utils.AddFriendsDialogListener;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.R;
-import com.zsolt.licenta.Utils.AddFriendsDialogListener;
 
 import java.util.List;
 
-public class AddFriendsAdapter extends RecyclerView.Adapter<AddFriendsViewHolder> {
+public class AddFriendsDialogAdapter extends RecyclerView.Adapter<AddFriendsDialogViewHolder> {
     private final List<Users> friendsList;
     private View itemView;
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
     private AddFriendsDialogListener listener;
 
-    public AddFriendsAdapter(List<Users> friendsList, AddFriendsDialogListener listener) {
+    public AddFriendsDialogAdapter(List<Users> friendsList, AddFriendsDialogListener listener) {
         this.friendsList = friendsList;
         this.listener = listener;
     }
@@ -32,16 +32,16 @@ public class AddFriendsAdapter extends RecyclerView.Adapter<AddFriendsViewHolder
 
     @NonNull
     @Override
-    public AddFriendsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.custom_add_friends_activity, parent, false);
+    public AddFriendsDialogViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.custom_add_friends_dialog, parent, false);
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
-        return new AddFriendsViewHolder(itemView);
+        return new AddFriendsDialogViewHolder(itemView);
     }
 
-
     @Override
-    public void onBindViewHolder(@NonNull AddFriendsViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull AddFriendsDialogViewHolder holder, int position) {
+
         Users user = friendsList.get(position);
         holder.getTextProfileName().setText(user.getName());
         String imagePath = "Images/" + user.getProfileImage();
@@ -50,10 +50,7 @@ public class AddFriendsAdapter extends RecyclerView.Adapter<AddFriendsViewHolder
             Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
             holder.getImageProfile().setImageBitmap(bitmap);
         });
-        holder.getButtonRemoveFriend().setOnClickListener(v -> {
-            friendsList.remove(holder.getAdapterPosition());
-            notifyDataSetChanged();
-        });
+        holder.itemView.setOnClickListener(v -> listener.addFriendtoRecyclerView(user));
     }
 
     @Override

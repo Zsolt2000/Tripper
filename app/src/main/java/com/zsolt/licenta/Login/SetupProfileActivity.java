@@ -1,6 +1,7 @@
 package com.zsolt.licenta.Login;
 
 
+import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -10,17 +11,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
+import android.location.Address;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -36,13 +36,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
-import com.google.android.libraries.places.api.model.AutocompletePrediction;
-import com.google.android.libraries.places.api.model.AutocompleteSessionToken;
-import com.google.android.libraries.places.api.model.PlaceTypes;
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -50,9 +44,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 import com.zsolt.licenta.MainMenu.MainMenuActivity;
+import com.zsolt.licenta.Activities.MapActivity;
 import com.zsolt.licenta.Models.Gender;
 import com.zsolt.licenta.Models.Interests;
 import com.zsolt.licenta.Models.Trips;
@@ -68,8 +62,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Pattern;
 
 public class SetupProfileActivity extends AppCompatActivity {
     private ImageView profileImage;
@@ -144,7 +136,7 @@ public class SetupProfileActivity extends AppCompatActivity {
                 Users user = new Users(uid, name, phoneNumber, age, dateOfBirth, location, interestsList, trips, imageName, gender);
                 databaseReference.child("Users").child(user.getUid()).setValue(user).addOnSuccessListener(unused -> {
                     Toast.makeText(this, "Successfully created your profile", Toast.LENGTH_SHORT).show();
-                    Intent mainActivity=new Intent(SetupProfileActivity.this,MainMenuActivity.class);
+                    Intent mainActivity = new Intent(SetupProfileActivity.this, MainMenuActivity.class);
                     startActivity(mainActivity);
                     finish();
                 });
@@ -198,11 +190,8 @@ public class SetupProfileActivity extends AppCompatActivity {
                         else
                             interestsList.add(Interests.valueOf(dialogItems[j]));
                     }
-
                     recyclerViewInterests.setAdapter(interestsAdapter);
-
                 }
-
             }).setNegativeButton("Cancel", (dialogInterface, id) -> dialogInterface.dismiss());
             builder.create();
             builder.show();
@@ -210,48 +199,22 @@ public class SetupProfileActivity extends AppCompatActivity {
     }
 
     private void setupLocation() {
-        locationsList = new ArrayList<>();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, locationsList);
-        editPlaceOfBirth.setAdapter(adapter);
-        AutocompleteSessionToken token = AutocompleteSessionToken.newInstance();
-        editPlaceOfBirth.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                        .setTypesFilter(Arrays.asList(PlaceTypes.CITIES))
-                        .setQuery(charSequence.toString())
-                        .build();
-
-                placesClient.findAutocompletePredictions(request).addOnSuccessListener((response) -> {
-                    for (AutocompletePrediction prediction : response.getAutocompletePredictions()) {
-                        if (!locationsList.contains(prediction.getPrimaryText(null).toString()))
-                            locationsList.add(prediction.getPrimaryText(null).toString());
-                        else
-                            locationsList.remove(prediction.getPrimaryText(null).toString());
-                        adapter.clear();
-                        adapter.addAll(locationsList);
-                        adapter.notifyDataSetChanged();
-                    }
-                }).addOnFailureListener((exception) -> {
-                    if (exception instanceof ApiException) {
-                        ApiException apiException = (ApiException) exception;
-
-                    }
-                });
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
+        editPlaceOfBirth.setOnClickListener(v -> {
+            Intent mapActivity = new Intent(SetupProfileActivity.this, MapActivity.class);
+            activityResultLauncher.launch(mapActivity);
         });
     }
+
+    private ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            if (result.getResultCode() == Activity.RESULT_OK) {
+                Intent mapData = result.getData();
+                Address address = mapData.getParcelableExtra("Location");
+                editPlaceOfBirth.setText(address.getLocality());
+            }
+        }
+    });
 
     private void getApiKey() {
         PackageManager packageManager = getPackageManager();
@@ -342,15 +305,6 @@ public class SetupProfileActivity extends AppCompatActivity {
         }
     });
 
-    /*@Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            Uri imageUri = data.getData();
-            Picasso.get().load(imageUri).into(profileImage);
-
-        }
-    }*/
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
