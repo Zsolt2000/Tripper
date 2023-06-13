@@ -72,10 +72,6 @@ public class MainMenuActivity extends AppCompatActivity {
         navigationDrawerSelection();
         bottomNavigationSelection();
 
-
-
-
-
         getSupportFragmentManager().beginTransaction().add(R.id.frameLayoutMain, new HomeFragment()).commit();
 
     }

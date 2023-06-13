@@ -16,9 +16,11 @@ import java.util.List;
 public class InterestsAdapter extends RecyclerView.Adapter<InterestsViewHolder> {
     private final List<Interests> interestsList;
     private View itemView;
+    private boolean isButtonVisible;
 
     public InterestsAdapter(List<Interests> interests) {
         this.interestsList = interests;
+
     }
 
     @NonNull
@@ -36,8 +38,20 @@ public class InterestsAdapter extends RecyclerView.Adapter<InterestsViewHolder> 
             interestsList.remove(holder.getAdapterPosition());
             notifyItemRemoved(holder.getAdapterPosition());
         });
+        if(isButtonVisible){
+            holder.getRemoveInterestButton().setVisibility(View.VISIBLE);
+        }else {
+            holder.getRemoveInterestButton().setVisibility(View.GONE);
 
+        }
     }
+
+    public void setButtonVisibility(boolean visibility)
+    {
+        this.isButtonVisible=visibility;
+        notifyDataSetChanged();
+    }
+
 
     @Override
     public int getItemCount() {

@@ -8,19 +8,16 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Rect;
 import android.location.Address;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -44,7 +41,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.nex3z.flowlayout.FlowLayout;
 import com.squareup.picasso.Picasso;
+import com.zsolt.licenta.CustomViews.AddInterestsDialogFragment;
 import com.zsolt.licenta.MainMenu.MainMenuActivity;
 import com.zsolt.licenta.Activities.MapActivity;
 import com.zsolt.licenta.Models.Gender;
@@ -52,7 +51,7 @@ import com.zsolt.licenta.Models.Interests;
 import com.zsolt.licenta.Models.Trips;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.R;
-import com.zsolt.licenta.ViewHolders.InterestsAdapter;
+import com.zsolt.licenta.Utils.AddInterestsDialogListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -63,35 +62,32 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-public class SetupProfileActivity extends AppCompatActivity {
+public class SetupProfileActivity extends AppCompatActivity implements AddInterestsDialogListener {
     private ImageView profileImage;
     private EditText editName, editAge, editDateOfBirth, editPhoneNumber;
     private AutoCompleteTextView editPlaceOfBirth;
     private ImageButton buttonAddInterests;
     private Button buttonSetupProfile;
-    private RecyclerView recyclerViewInterests;
+    private FlowLayout flowLayoutInterests;
     private Spinner spinnerGender;
     private TextView textAddInterests, textAddProfileImage, textSelectGender;
     private Toolbar toolbar;
     private ActionBar actionbar;
-    private List<Gender> genderList;
     private PlacesClient placesClient;
-    private List<String> locationsList;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
     private FirebaseUser firebaseUser;
-    private Gender gender;
-    private InterestsAdapter interestsAdapter;
-    private List<Interests> interestsList;
     private boolean hasImage = false;
+    private Users currentUser;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setup_profile);
+        currentUser = new Users();
         setupViews();
         setupToolbar();
         setupSpinner();
@@ -101,10 +97,23 @@ public class SetupProfileActivity extends AppCompatActivity {
         setupProfile();
         setupFirebase();
         getApiKey();
+        setupFlowLayout(new ArrayList<>());
         profileImage.setOnClickListener(view -> openGallery.launch("image/*"));
 
 
     }
+
+    private void setupFlowLayout(List<Interests> interestsList) {
+        flowLayoutInterests.setChildSpacing(5);
+        flowLayoutInterests.setRowSpacing(15f);
+        for (int i = 0; i < interestsList.size(); i++) {
+            View itemView = LayoutInflater.from(this).inflate(R.layout.custom_add_interests, flowLayoutInterests, false);
+            TextView text = itemView.findViewById(R.id.text_interest_name);
+            text.setText(interestsList.get(i).toString());
+            flowLayoutInterests.addView(itemView);
+        }
+    }
+
 
     private void setupFirebase() {
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -117,24 +126,26 @@ public class SetupProfileActivity extends AppCompatActivity {
     private void setupProfile() {
         buttonSetupProfile.setOnClickListener(view -> {
             if (validProfile()) {
-                String uid = firebaseUser.getUid();
-                String name = editName.getText().toString();
-                String phoneNumber = editPhoneNumber.getText().toString();
-                String imageName = null;
+                currentUser.setUid(firebaseUser.getUid());
+                currentUser.setName(editName.getText().toString());
+                currentUser.setPhoneNumber(editPhoneNumber.getText().toString());
+                currentUser.setAge(Integer.parseInt(editAge.getText().toString()));
+
+                //String imageName = null;
                 String dateOfBirth = editDateOfBirth.getText().toString();
                 String location = editPlaceOfBirth.getText().toString();
                 int age = Integer.parseInt(editAge.getText().toString());
                 HashMap<Integer, Trips> trips = new HashMap<>();
                 if (hasImage) {
                     UUID randomID = UUID.randomUUID();
-                    imageName = randomID + ".jpg";
-                    String imageLocation = "Images/" + imageName;
+                    String imageName = randomID + ".jpg";
+                    String imagePath = "Images/" + imageName;
+                    currentUser.setProfileImage(imageName);
                     Uri userImage = Uri.parse(profileImage.getTag().toString());
-                    storageReference.child(imageLocation).putFile(userImage).addOnSuccessListener(taskSnapshot -> {
+                    storageReference.child(imagePath).putFile(userImage).addOnSuccessListener(taskSnapshot -> {
                     });
                 }
-                Users user = new Users(uid, name, phoneNumber, age, dateOfBirth, location, interestsList, trips, imageName, gender);
-                databaseReference.child("Users").child(user.getUid()).setValue(user).addOnSuccessListener(unused -> {
+                databaseReference.child("Users").child(currentUser.getUid()).setValue(currentUser).addOnSuccessListener(unused -> {
                     Toast.makeText(this, "Successfully created your profile", Toast.LENGTH_SHORT).show();
                     Intent mainActivity = new Intent(SetupProfileActivity.this, MainMenuActivity.class);
                     startActivity(mainActivity);
@@ -150,7 +161,7 @@ public class SetupProfileActivity extends AppCompatActivity {
         String age = editAge.getText().toString();
         String dateOfBirth = editDateOfBirth.getText().toString();
         String location = editPlaceOfBirth.getText().toString();
-        if (name.isEmpty() || phoneNumber.isEmpty() || age.isEmpty() || dateOfBirth.isEmpty() || location.isEmpty() || interestsList.isEmpty()) {
+        if (name.isEmpty() || phoneNumber.isEmpty() || age.isEmpty() || dateOfBirth.isEmpty() || location.isEmpty() || flowLayoutInterests.getChildCount()==0) {
             Toast.makeText(this, "Please fill in the fields", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -159,59 +170,27 @@ public class SetupProfileActivity extends AppCompatActivity {
 
 
     private void setupInterests() {
-        interestsList = new ArrayList<>();
-        List<Integer> selectedInterests = new ArrayList<>();
-        String[] dialogItems = new String[Interests.values().length];
-        for (int i = 0; i < Interests.values().length; i++)
-            dialogItems[i] = Interests.values()[i].toString();
-        recyclerViewInterests.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        recyclerViewInterests.addItemDecoration(new RecyclerView.ItemDecoration() {
-            @Override
-            public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
-                super.getItemOffsets(outRect, view, parent, state);
-                outRect.right = 10;
-            }
-        });
         buttonAddInterests.setOnClickListener(view -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(SetupProfileActivity.this);
-            builder.setTitle("Select your interests");
-            builder.setMultiChoiceItems(dialogItems, null, (dialogInterface, which, isChecked) -> {
-                if (isChecked) {
-                    selectedInterests.add(which);
-                } else if (selectedInterests.contains(which)) {
-                    selectedInterests.remove(which);
-                }
-            }).setPositiveButton("Add", (dialogInterface, id) -> {
-                interestsAdapter = new InterestsAdapter(interestsList);
-                for (int j = 0; j < dialogItems.length; j++) {
-                    if (selectedInterests.contains(j)) {
-                        if (interestsList.contains(Interests.valueOf(dialogItems[j])))
-                            continue;
-                        else
-                            interestsList.add(Interests.valueOf(dialogItems[j]));
-                    }
-                    recyclerViewInterests.setAdapter(interestsAdapter);
-                }
-            }).setNegativeButton("Cancel", (dialogInterface, id) -> dialogInterface.dismiss());
-            builder.create();
-            builder.show();
+            AddInterestsDialogFragment fragment = new AddInterestsDialogFragment(currentUser.getInterests(), SetupProfileActivity.this);
+            fragment.show(getSupportFragmentManager(), "Friends");
         });
     }
 
     private void setupLocation() {
         editPlaceOfBirth.setOnClickListener(v -> {
             Intent mapActivity = new Intent(SetupProfileActivity.this, MapActivity.class);
-            activityResultLauncher.launch(mapActivity);
+            getLocationFromMap.launch(mapActivity);
         });
     }
 
-    private ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+    private final ActivityResultLauncher<Intent> getLocationFromMap = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
             if (result.getResultCode() == Activity.RESULT_OK) {
                 Intent mapData = result.getData();
                 Address address = mapData.getParcelableExtra("Location");
                 editPlaceOfBirth.setText(address.getLocality());
+                currentUser.setHomeLocation(address.getLocality());
             }
         }
     });
@@ -245,6 +224,7 @@ public class SetupProfileActivity extends AppCompatActivity {
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                 String selectedDate = dateFormat.format(calendar.getTime());
                 editDateOfBirth.setText(selectedDate);
+                currentUser.setDateOfBirth(selectedDate);
             }, year, month, day);
             datePickerDialog.show();
         });
@@ -259,29 +239,29 @@ public class SetupProfileActivity extends AppCompatActivity {
     }
 
     private void setupViews() {
-        profileImage = findViewById(R.id.imageProfile);
-        editName = findViewById(R.id.editName);
-        editAge = findViewById(R.id.editAge);
-        spinnerGender = findViewById(R.id.spinnerGender);
-        editDateOfBirth = findViewById(R.id.editDateOfBirth);
-        editPlaceOfBirth = findViewById(R.id.editPlaceOfBirth);
-        recyclerViewInterests = findViewById(R.id.recyclerViewInterests);
-        buttonAddInterests = findViewById(R.id.button_add_interests);
+        profileImage = findViewById(R.id.image_setup_profile);
+        editName = findViewById(R.id.edit_setup_name);
+        editAge = findViewById(R.id.edit_setup_age);
+        spinnerGender = findViewById(R.id.spinner_setup_gender);
+        editDateOfBirth = findViewById(R.id.edit_setup_date);
+        editPlaceOfBirth = findViewById(R.id.edit_setup_place);
+        flowLayoutInterests = findViewById(R.id.flowlayout_interests);
+        buttonAddInterests = findViewById(R.id.button_profile_add_interests);
         textAddInterests = findViewById(R.id.text_add_interests);
-        buttonSetupProfile = findViewById(R.id.buttonSaveProfile);
+        buttonSetupProfile = findViewById(R.id.button_setup_save_profile);
         textAddProfileImage = findViewById(R.id.text_setup_profile);
         textSelectGender = findViewById(R.id.text_select_gender);
         editPhoneNumber = findViewById(R.id.edit_phone_number);
     }
 
     private void setupSpinner() {
-        genderList = new ArrayList<>();
-        genderList = Arrays.asList(Gender.values());
-        spinnerGender.setAdapter(getDefaultAdapter());
+
+        List<Gender> genderList = Arrays.asList(Gender.values());
+        spinnerGender.setAdapter(new ArrayAdapter<Gender>(SetupProfileActivity.this, android.R.layout.simple_spinner_item, genderList));
         spinnerGender.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                gender = (Gender) adapterView.getItemAtPosition(i);
+                currentUser.setGender((Gender) adapterView.getItemAtPosition(i));
             }
 
             @Override
@@ -289,11 +269,6 @@ public class SetupProfileActivity extends AppCompatActivity {
 
             }
         });
-    }
-
-
-    private ArrayAdapter<Gender> getDefaultAdapter() {
-        return new ArrayAdapter<Gender>(SetupProfileActivity.this, android.R.layout.simple_spinner_item, genderList);
     }
 
     private final ActivityResultLauncher<String> openGallery = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
@@ -314,4 +289,23 @@ public class SetupProfileActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onAddInterest(List<Interests> interestsList) {
+        flowLayoutInterests.removeAllViews();
+        currentUser.setInterests(interestsList);
+        setupFlowLayout(interestsList);
+        removeInterestFromLayout();
+    }
+    private void removeInterestFromLayout() {
+        for (int i = 0; i < flowLayoutInterests.getChildCount(); i++) {
+            View itemView = flowLayoutInterests.getChildAt(i);
+            ImageButton buttonRemoveInterest = itemView.findViewById(R.id.remove_button_interest);
+            buttonRemoveInterest.setVisibility(View.VISIBLE);
+            buttonRemoveInterest.setOnClickListener(v1 -> {
+                flowLayoutInterests.removeView(itemView);
+                TextView interestName = itemView.findViewById(R.id.text_interest_name);
+                currentUser.getInterests().remove(Interests.valueOf(interestName.getText().toString()));
+            });
+        }
+    }
 }

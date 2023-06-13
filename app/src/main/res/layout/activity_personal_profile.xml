@@ -6,4 +6,153 @@
     android:layout_height="match_parent"
     tools:context=".Activities.PersonalProfileActivity">
 
+    <include
+        android:id="@+id/toolbar_personal_profile"
+        layout="@layout/toolbar" />
+
+    <ScrollView
+        android:id="@+id/scroll_personal_profile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_personal_profile"
+        >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_profile_activity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@id/scroll_personal_profile">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/image_personal_profile"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="12dp"
+                android:src="@drawable/profile_icon"
+                app:civ_border_color="@color/app_color"
+                app:civ_border_width="3dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.498"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/layout_profile_activity" />
+
+            <View
+                android:id="@+id/personal_profile_separator"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@color/quantum_grey"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/image_personal_profile" />
+
+            <EditText
+                android:id="@+id/edit_personal_profile_name"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/edittext_style"
+                android:ems="10"
+                android:hint="Name"
+                android:inputType="text"
+                android:padding="10dp"
+                android:textColor="@drawable/custom_text_focusable_color"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/personal_profile_separator" />
+
+            <EditText
+                android:id="@+id/edit_personal_profile_age"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edittext_style"
+                android:ems="10"
+                android:hint="Age"
+                android:inputType="number"
+                android:padding="10dp"
+                android:textColor="@drawable/custom_text_focusable_color"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_personal_profile_name" />
+
+            <EditText
+                android:id="@+id/edit_personal_profile_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edittext_style"
+                android:ems="10"
+                android:hint="Phone number"
+                android:inputType="phone"
+                android:padding="10dp"
+                android:textColor="@drawable/custom_text_focusable_color"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_personal_profile_age" />
+
+            <Spinner
+                android:id="@+id/spinner_personal_profile_gender"
+                android:layout_width="211dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edittext_style"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_personal_profile_phone" />
+
+            <EditText
+                android:id="@+id/edit_personal_profile_date"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edittext_style"
+                android:ems="10"
+                android:hint="Date of birth"
+                android:padding="10dp"
+                android:focusable="false"
+                android:textColor="@drawable/custom_text_focusable_color"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinner_personal_profile_gender" />
+
+            <EditText
+                android:id="@+id/edit_personal_profile_place"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edittext_style"
+                android:ems="10"
+                android:hint="Place of birth"
+                android:padding="10dp"
+                android:focusable="false"
+                android:textColor="@drawable/custom_text_focusable_color"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_personal_profile_date" />
+
+            <com.nex3z.flowlayout.FlowLayout
+                android:id="@+id/flowlayout_personal_profile_interests"
+                android:layout_width="208dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="100dp"
+                android:background="@drawable/edittext_style"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_personal_profile_place" />
+
+            <ImageButton
+                android:id="@+id/button_profile_add_interests"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/button_style"
+                android:src="@drawable/add_icon"
+                android:visibility="invisible"
+                app:layout_constraintStart_toEndOf="@+id/flowlayout_personal_profile_interests"
+                app:layout_constraintTop_toBottomOf="@+id/edit_personal_profile_place" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".Login.SetupProfileActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/signuplayout"
+    <include
+        android:id="@+id/toolbar_setup_profile"
+        layout="@layout/toolbar" />
+
+    <ScrollView
+        android:id="@+id/layout_scrollview_setup_profile"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <include
-            android:id="@+id/toolbar_setup_profile"
-            layout="@layout/toolbar"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/toolbar_setup_profile">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_constraint_setup_profile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/imageProfile"
+            android:id="@+id/image_setup_profile"
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:layout_marginTop="32dp"
@@ -27,10 +30,10 @@
             app:civ_border_width="3dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar_setup_profile" />
+            app:layout_constraintTop_toTopOf="@id/layout_constraint_setup_profile"/>
 
         <EditText
-            android:id="@+id/editName"
+            android:id="@+id/edit_setup_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -41,10 +44,10 @@
             android:inputType="text"
             android:padding="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageProfile" />
+            app:layout_constraintTop_toBottomOf="@+id/image_setup_profile" />
 
         <EditText
-            android:id="@+id/editAge"
+            android:id="@+id/edit_setup_age"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -55,10 +58,10 @@
             android:inputType="number"
             android:padding="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editName" />
+            app:layout_constraintTop_toBottomOf="@+id/edit_setup_name" />
 
         <Spinner
-            android:id="@+id/spinnerGender"
+            android:id="@+id/spinner_setup_gender"
             android:layout_width="209dp"
             android:layout_height="43dp"
             android:layout_marginStart="16dp"
@@ -67,30 +70,30 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edit_phone_number" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewInterests"
+        <com.nex3z.flowlayout.FlowLayout
+            android:id="@+id/flowlayout_interests"
             android:layout_width="208dp"
-            android:layout_height="28dp"
+            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="12dp"
             android:background="@drawable/edittext_style"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editPlaceOfBirth" />
+            app:layout_constraintTop_toBottomOf="@+id/edit_setup_place" />
 
         <AutoCompleteTextView
-            android:id="@+id/editPlaceOfBirth"
+            android:id="@+id/edit_setup_place"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/edittext_style"
             android:ems="10"
-            android:hint="Place of Birth"
             android:focusable="false"
+            android:hint="Place of Birth"
             android:inputType="text"
             android:padding="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editDateOfBirth" />
+            app:layout_constraintTop_toBottomOf="@+id/edit_setup_date" />
 
         <TextView
             android:id="@+id/text_add_interests"
@@ -100,21 +103,21 @@
             android:layout_marginTop="4dp"
             android:text="*Insert your interests"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/recyclerViewInterests" />
+            app:layout_constraintTop_toBottomOf="@+id/flowlayout_interests" />
 
         <ImageButton
-            android:id="@+id/button_add_interests"
+            android:id="@+id/button_profile_add_interests"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:layout_marginStart="4dp"
             android:layout_marginTop="12dp"
             android:background="@drawable/button_style"
             android:src="@drawable/add_icon"
-            app:layout_constraintStart_toEndOf="@+id/recyclerViewInterests"
-            app:layout_constraintTop_toBottomOf="@+id/editPlaceOfBirth" />
+            app:layout_constraintStart_toEndOf="@+id/flowlayout_interests"
+            app:layout_constraintTop_toBottomOf="@+id/edit_setup_place" />
 
         <EditText
-            android:id="@+id/editDateOfBirth"
+            android:id="@+id/edit_setup_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -127,21 +130,9 @@
             android:inputType="date"
             android:padding="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerGender" />
+            app:layout_constraintTop_toBottomOf="@+id/spinner_setup_gender" />
 
-        <Button
-            android:id="@+id/buttonSaveProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
-            android:background="@drawable/button_style"
-            android:text="Set up profile"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.503"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_add_interests"
-            app:layout_constraintVertical_bias="0.133" />
+
 
         <TextView
             android:id="@+id/text_select_gender"
@@ -151,7 +142,7 @@
             android:layout_marginTop="8dp"
             android:text="Select your gender"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinnerGender" />
+            app:layout_constraintTop_toBottomOf="@+id/spinner_setup_gender" />
 
         <TextView
             android:id="@+id/text_set_image_profile"
@@ -161,7 +152,7 @@
             android:text="Open to set an image"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageProfile" />
+            app:layout_constraintTop_toBottomOf="@+id/image_setup_profile" />
 
         <EditText
             android:id="@+id/edit_phone_number"
@@ -175,7 +166,21 @@
             android:inputType="phone"
             android:padding="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editAge" />
+            app:layout_constraintTop_toBottomOf="@+id/edit_setup_age" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+            <Button
+                android:id="@+id/button_setup_save_profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="100dp"
+                android:background="@drawable/button_style"
+                android:text="Set up profile"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.503"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_add_interests" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>
