@@ -8,13 +8,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.zsolt.licenta.MainMenu.MainMenuActivity;
 import com.zsolt.licenta.R;
+
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText editEmail, editPassword;
@@ -22,19 +32,48 @@ public class LoginActivity extends AppCompatActivity {
     private TextView textForgotPassword;
     private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
     private Toolbar toolbar;
+    private boolean isProfileSet = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         setupViews();
+        setupFirebase();
         login();
         signUp();
         forgotPassword();
+        setupLogin();
         setSupportActionBar(toolbar);
-        firebaseAuth = FirebaseAuth.getInstance();
     }
+
+    private void setupLogin() {
+        if (firebaseUser != null) {
+            databaseReference.child("Users").child(firebaseUser.getUid()).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Intent mainActivity = new Intent(LoginActivity.this, MainMenuActivity.class);
+                    startActivity(mainActivity);
+                    finish();
+                } else {
+                    Toast.makeText(LoginActivity.this, "First set up your profile first", Toast.LENGTH_SHORT).show();
+                    Intent setupProfile = new Intent(LoginActivity.this, WelcomeUsersActivity.class);
+                    startActivity(setupProfile);
+                }
+            });
+        }
+    }
+
+
+    private void setupFirebase() {
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference();
+    }
+
 
     private void forgotPassword() {
         textForgotPassword.setOnClickListener(view -> {
@@ -61,19 +100,9 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin = findViewById(R.id.buttonLogin);
         buttonSignUp = findViewById(R.id.buttonSignUp);
         textForgotPassword = findViewById(R.id.textForgotPassword);
-        toolbar=findViewById(R.id.toolbar_login);
+        toolbar = findViewById(R.id.toolbar_login);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        firebaseUser = firebaseAuth.getCurrentUser();
-        if (firebaseUser != null) {
-            Intent mainActivity = new Intent(LoginActivity.this, MainMenuActivity.class);
-            startActivity(mainActivity);
-            finish();
-        }
-    }
 
     private void signUp() {
         buttonSignUp.setOnClickListener(view -> {

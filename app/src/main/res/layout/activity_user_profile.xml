@@ -4,18 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.PersonalProfileActivity">
+    tools:context=".Activities.UserProfileActivity">
 
     <include
-        android:id="@+id/toolbar_personal_profile"
+        android:id="@+id/toolbar"
         layout="@layout/toolbar" />
 
     <ScrollView
         android:id="@+id/scroll_user_profile"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/toolbar_personal_profile"
-        >
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        tools:layout_editor_absoluteX="-203dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_user_activity"
@@ -36,16 +36,40 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/layout_user_activity" />
 
+            <Button
+                android:id="@+id/button_add_friend"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/button_style"
+                android:text="Add friend"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.176"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/image_user_profile" />
+
+            <Button
+                android:id="@+id/button_start_chat"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/button_style"
+                android:text="Start Chat"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.675"
+                app:layout_constraintStart_toEndOf="@+id/button_add_friend"
+                app:layout_constraintTop_toBottomOf="@+id/image_user_profile" />
+
             <View
                 android:id="@+id/user_profile_separator"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="60dp"
                 android:background="@color/quantum_grey"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/image_user_profile" />
 
-            <EditText
+            <TextView
                 android:id="@+id/text_user_profile_name"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
@@ -53,14 +77,13 @@
                 android:layout_marginTop="12dp"
                 android:background="@drawable/edittext_style"
                 android:ems="10"
-                android:hint="Name"
-                android:inputType="text"
                 android:padding="10dp"
+                android:text="Name"
                 android:textColor="@drawable/custom_text_focusable_color"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/user_profile_separator" />
 
-            <EditText
+            <TextView
                 android:id="@+id/text_user_profile_age"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
@@ -68,14 +91,13 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/edittext_style"
                 android:ems="10"
-                android:hint="Age"
-                android:inputType="number"
                 android:padding="10dp"
+                android:text="Age"
                 android:textColor="@drawable/custom_text_focusable_color"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_user_profile_name" />
 
-            <EditText
+            <TextView
                 android:id="@+id/text_user_profile_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
@@ -83,24 +105,27 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/edittext_style"
                 android:ems="10"
-                android:hint="Phone number"
-                android:inputType="phone"
                 android:padding="10dp"
+                android:text="Phone number"
                 android:textColor="@drawable/custom_text_focusable_color"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_user_profile_age" />
 
-            <Spinner
+            <TextView
                 android:id="@+id/text_user_profile_gender"
-                android:layout_width="211dp"
+                android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/edittext_style"
+                android:ems="10"
+                android:padding="10dp"
+                android:text="Gender"
+                android:textColor="@drawable/custom_text_focusable_color"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_user_profile_phone" />
 
-            <EditText
+            <TextView
                 android:id="@+id/text_user_profile_date"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
@@ -108,14 +133,14 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/edittext_style"
                 android:ems="10"
-                android:hint="Date of birth"
-                android:padding="10dp"
                 android:focusable="false"
+                android:padding="10dp"
+                android:text="Date of birth"
                 android:textColor="@drawable/custom_text_focusable_color"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_user_profile_gender" />
 
-            <EditText
+            <TextView
                 android:id="@+id/text_user_profile_place"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
@@ -123,9 +148,9 @@
                 android:layout_marginTop="8dp"
                 android:background="@drawable/edittext_style"
                 android:ems="10"
-                android:hint="Place of birth"
-                android:padding="10dp"
                 android:focusable="false"
+                android:padding="10dp"
+                android:text="Place of birth"
                 android:textColor="@drawable/custom_text_focusable_color"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_user_profile_date" />
@@ -142,17 +167,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/text_user_profile_place" />
 
-            <ImageButton
-                android:id="@+id/button_profile_add_interests"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/button_style"
-                android:src="@drawable/add_icon"
-                android:visibility="invisible"
-                app:layout_constraintStart_toEndOf="@+id/flowlayout_user_profile_interests"
-                app:layout_constraintTop_toBottomOf="@+id/text_user_profile_place" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

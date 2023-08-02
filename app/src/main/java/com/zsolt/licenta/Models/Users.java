@@ -3,15 +3,16 @@ package com.zsolt.licenta.Models;
 import android.media.Image;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-
-public class Users {
+public class Users implements Serializable {
 
 
     private String uid;
@@ -21,17 +22,15 @@ public class Users {
     private String dateOfBirth;
     private String homeLocation;
     private List<Interests> interests;
-
-    private HashMap<Integer, Trips> tripsHashMap;
-
+    private HashMap<String,Users> friendsList;
+    private String deviceToken;
+    private List<Trips> tripsList;
     private Gender gender;
-
     private String profileImage;
-
     public Users() {
     }
 
-    public Users(String uid, String name, String phoneNumber, int age, String dateOfBirth, String homeLocation, List<Interests> interests, HashMap<Integer, Trips> tripsHashMap, String profileImage, Gender gender) {
+    public Users(String uid, String name, String phoneNumber, int age, String dateOfBirth, String homeLocation, List<Interests> interests, List< Trips> tripsList, String profileImage, Gender gender,HashMap<String,Users>friendsList,String deviceToken) {
         this.uid = uid;
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -39,9 +38,28 @@ public class Users {
         this.dateOfBirth = dateOfBirth;
         this.homeLocation = homeLocation;
         this.interests = interests;
-        this.tripsHashMap = new HashMap<>();
+        this.tripsList = tripsList;
         this.gender = gender;
         this.profileImage = profileImage;
+        this.deviceToken=deviceToken;
+        this.friendsList=friendsList;
+    }
+
+
+    public HashMap<String,Users> getFriendsList() {
+        return friendsList;
+    }
+
+    public void setFriendsList(HashMap<String,Users> friendsList) {
+        this.friendsList = friendsList;
+    }
+
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
     }
 
 
@@ -94,12 +112,12 @@ public class Users {
     }
 
 
-    public HashMap<Integer, Trips> getTripsHashMap() {
-        return tripsHashMap;
+    public List<Trips> getTripsList() {
+        return tripsList;
     }
 
-    public void setTripsHashMap(HashMap<Integer, Trips> tripsHashMap) {
-        this.tripsHashMap = tripsHashMap;
+    public void setTripsList(List<Trips> tripsHashMap) {
+        this.tripsList = tripsHashMap;
     }
 
     public String getProfileImage() {
@@ -126,20 +144,10 @@ public class Users {
         this.uid = uid;
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return "Users{" +
-                "uid='" + uid + '\'' +
-                ", name='" + name + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", age=" + age +
-                ", dateOfBirth='" + dateOfBirth + '\'' +
-                ", homeLocation='" + homeLocation + '\'' +
-                ", interests=" + interests +
-                ", tripsHashMap=" + tripsHashMap +
-                ", gender=" + gender +
-                ", profileImage='" + profileImage + '\'' +
-                '}';
+        return name;
     }
 
     @Override

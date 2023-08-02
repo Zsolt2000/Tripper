@@ -32,7 +32,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
     private GoogleMap map;
     private SupportMapFragment supportMapFragment;
-    private Fragment autocompleteSupportFragment;
     private Button buttonSelectLocation;
     private MarkerOptions markerOptions;
 

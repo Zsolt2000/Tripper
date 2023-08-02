@@ -3,7 +3,6 @@ package com.zsolt.licenta.Activities;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,8 +14,6 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,21 +35,21 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.nex3z.flowlayout.FlowLayout;
 import com.squareup.picasso.Picasso;
 import com.zsolt.licenta.CustomViews.AddInterestsDialogFragment;
-import com.zsolt.licenta.Login.SetupProfileActivity;
 import com.zsolt.licenta.Models.Gender;
 import com.zsolt.licenta.Models.Interests;
 import com.zsolt.licenta.Models.Users;
@@ -105,8 +102,8 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
         currentUser.setAge(Integer.parseInt(editProfileAge.getText().toString()));
         currentUser.setName(editProfileName.getText().toString());
         currentUser.setPhoneNumber(editProfilePhone.getText().toString());
-        HashMap<String,Object> updatedProfile=new HashMap<>();
-        updatedProfile.put(currentUser.getUid(),currentUser);
+        HashMap<String, Object> updatedProfile = new HashMap<>();
+        updatedProfile.put(currentUser.getUid(), currentUser);
         databaseReference.child("Users").updateChildren(updatedProfile, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
@@ -178,7 +175,8 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
         @Override
         public void onActivityResult(Uri result) {
             Picasso.get().load(result).into(imagePersonalProfile);
-            storageReference.child("Images/" + currentUser.getProfileImage()).putFile(result).addOnSuccessListener(taskSnapshot -> {});
+            storageReference.child("Images/" + currentUser.getProfileImage()).putFile(result).addOnSuccessListener(taskSnapshot -> {
+            });
         }
     });
 
@@ -231,23 +229,15 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
                 editProfileDate.setText(currentUser.getDateOfBirth());
                 editProfilePlace.setText(currentUser.getHomeLocation());
                 spinnerProfileGender.setSelection(currentUser.getGender().ordinal());
-                String imageUri = currentUser.getProfileImage();
-                String imagePath = "Images/" + imageUri;
-                final long IMAGE_SIZE = 1024 * 1024;
-                storageReference.child(imagePath).getBytes(IMAGE_SIZE).addOnSuccessListener(bytes -> {
-                    Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    imagePersonalProfile.setImageBitmap(bitmap);
-                });
+                storageReference.child("Images/" + currentUser.getProfileImage()).getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).placeholder(R.drawable.profile_icon).into(imagePersonalProfile));
                 setupSpinner();
                 setupFlowLayout(currentUser.getInterests(), View.GONE);
-
-
             }
         });
     }
 
 
-    private void setupFirebase() {
+    private void setupFirebase(){
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
         databaseReference = firebaseDatabase.getReference();
@@ -257,16 +247,16 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
 
     private void setupViews() {
         toolbar = findViewById(R.id.toolbar_personal_profile);
-        layoutPersonalProfile = findViewById(R.id.layout_profile_activity);
-        imagePersonalProfile = findViewById(R.id.image_personal_profile);
-        editProfileName = findViewById(R.id.edit_personal_profile_name);
-        editProfileAge = findViewById(R.id.edit_personal_profile_age);
-        editProfilePhone = findViewById(R.id.edit_personal_profile_phone);
-        editProfileDate = findViewById(R.id.edit_personal_profile_date);
-        editProfilePlace = findViewById(R.id.edit_personal_profile_place);
-        flowLayoutInterests = findViewById(R.id.flowlayout_personal_profile_interests);
+        layoutPersonalProfile = findViewById(R.id.layout_user_activity);
+        imagePersonalProfile = findViewById(R.id.image_user_profile);
+        editProfileName = findViewById(R.id.text_user_profile_name);
+        editProfileAge = findViewById(R.id.text_user_profile_age);
+        editProfilePhone = findViewById(R.id.text_user_profile_phone);
+        editProfileDate = findViewById(R.id.text_user_profile_date);
+        editProfilePlace = findViewById(R.id.text_user_profile_place);
+        flowLayoutInterests = findViewById(R.id.flowlayout_user_profile_interests);
         buttonAddInterests = findViewById(R.id.button_profile_add_interests);
-        spinnerProfileGender = findViewById(R.id.spinner_personal_profile_gender);
+        spinnerProfileGender = findViewById(R.id.text_user_profile_gender);
     }
 
     @Override

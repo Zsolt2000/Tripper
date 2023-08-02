@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -67,24 +68,18 @@ public class AddFriendDialogFragment extends AppCompatDialogFragment {
                 outRect.left = 10;
             }
         });
-        databaseReference.child("Users").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    if (ds.getValue(Users.class).getUid().equals(FirebaseAuth.getInstance().getUid())) {
-                        continue;
-                    } else {
-                        friendsList.add(ds.getValue(Users.class));
-                    }
+        databaseReference.child("Users").get().addOnSuccessListener(dataSnapshot -> {
+            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                if (ds.getValue(Users.class).getUid().equals(FirebaseAuth.getInstance().getUid())) {
+                    continue;
+                } else {
+                    friendsList.add(ds.getValue(Users.class));
                 }
-                recyclerView.setAdapter(new AddFriendsDialogAdapter(friendsList, listener));
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            recyclerView.setAdapter(new AddFriendsDialogAdapter(friendsList, listener));
         });
     }
 }
+
+
 

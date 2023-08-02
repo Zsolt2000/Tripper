@@ -1,22 +1,43 @@
 package com.zsolt.licenta.MainMenu;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,17 +51,23 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 import com.zsolt.licenta.Activities.PersonalProfileActivity;
+import com.zsolt.licenta.Activities.UserProfileActivity;
 import com.zsolt.licenta.Login.LoginActivity;
 import com.zsolt.licenta.R;
 import com.zsolt.licenta.Models.Users;
+import com.zsolt.licenta.Utils.TripperActivityLifecycleCallbacks;
+import com.zsolt.licenta.ViewHolders.SuggestionsAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainMenuActivity extends AppCompatActivity {
     private BottomNavigationView bottomNav;
@@ -56,9 +83,9 @@ public class MainMenuActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
+    private List<Users> usersList;
+    private SuggestionsAdapter suggestionsAdapter;
     private Users currentUser;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +98,6 @@ public class MainMenuActivity extends AppCompatActivity {
         addTrips();
         navigationDrawerSelection();
         bottomNavigationSelection();
-
         getSupportFragmentManager().beginTransaction().add(R.id.frameLayoutMain, new HomeFragment()).commit();
 
     }
@@ -81,28 +107,25 @@ public class MainMenuActivity extends AppCompatActivity {
         ImageView headerProfileImage = headerView.findViewById(R.id.header_profile_image);
         TextView headerTextView = headerView.findViewById(R.id.header_profile_name);
         String uid = firebaseUser.getUid();
-        databaseReference.child("Users").child(uid).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DataSnapshot dataSnapshot=task.getResult();
-                    String userName = dataSnapshot.child("name").getValue(String.class);
-                    String imageUri = dataSnapshot.child("profileImage").getValue(String.class);
-                    String imagePath="Images/"+imageUri;
-
-                    final long IMAGE_SIZE=1024*1024;
-                    storageReference.child(imagePath).getBytes(IMAGE_SIZE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-                        @Override
-                        public void onSuccess(byte[] bytes) {
-                            Bitmap imageBitmap=BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-                            headerProfileImage.setImageBitmap(imageBitmap);
-                        }
-                    });
-                    headerTextView.setText(userName);
-                }
+        databaseReference.child("Users").child(uid).get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                currentUser = task.getResult().getValue(Users.class);
+                storageReference.child("Images/" + currentUser.getProfileImage()).getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).placeholder(R.drawable.profile_icon).into(headerProfileImage));
+                headerTextView.setText(currentUser.getName());
+                saveUserToSharedPreference();
             }
         });
     }
+
+    private void saveUserToSharedPreference() {
+        SharedPreferences sharedPreferences = getSharedPreferences("TripperPreference", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson=new Gson();
+        String currentUserToJson=gson.toJson(currentUser);
+        editor.putString("currentUser",currentUserToJson);
+        editor.apply();
+    }
+
 
     private void setupFirebase() {
         firebaseAuth = FirebaseAuth.getInstance();
@@ -148,7 +171,7 @@ public class MainMenuActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_profile:
-                    Intent profileActivity=new Intent(MainMenuActivity.this, PersonalProfileActivity.class);
+                    Intent profileActivity = new Intent(MainMenuActivity.this, PersonalProfileActivity.class);
                     startActivity(profileActivity);
                     break;
                 case R.id.nav_trips:
@@ -164,7 +187,6 @@ public class MainMenuActivity extends AppCompatActivity {
                     FirebaseAuth.getInstance().signOut();
                     Intent loginActivity = new Intent(MainMenuActivity.this, LoginActivity.class);
                     startActivity(loginActivity);
-                    finish();
             }
             return true;
         });
@@ -202,5 +224,57 @@ public class MainMenuActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.menu_search).setOnActionExpandListener(onActionExpandListener);
+        AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) menuItem.getActionView();
+        autoCompleteTextView.setHint("Search for people");
+        autoCompleteTextView.setThreshold(1);
+        setupSearchSuggestions();
+        suggestionsAdapter = new SuggestionsAdapter(getApplicationContext(), R.layout.custom_suggestion_dropdown_item, usersList);
+        autoCompleteTextView.setAdapter(suggestionsAdapter);
+        autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
+            Users selectedUser = suggestionsAdapter.getItem(position);
+            Intent intent = new Intent(MainMenuActivity.this, UserProfileActivity.class);
+            intent.putExtra("selectedUser", selectedUser);
+            startActivity(intent);
+        });
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
+    private void setupSearchSuggestions() {
+        usersList = new ArrayList<>();
+        databaseReference.child("Users").get().addOnSuccessListener(dataSnapshot -> {
+            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                if (ds.getValue(Users.class).getUid().equals(currentUser.getUid()))
+                    continue;
+                else
+                    usersList.add(ds.getValue(Users.class));
+            }
+        });
+
+    }
+
+    private final MenuItem.OnActionExpandListener onActionExpandListener = new MenuItem.OnActionExpandListener() {
+        @Override
+        public boolean onMenuItemActionExpand(@NonNull MenuItem item) {
+            return true;
+        }
+
+        @Override
+        public boolean onMenuItemActionCollapse(@NonNull MenuItem item) {
+            return true;
+        }
+    };
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        setHeaderProfile();
     }
 }

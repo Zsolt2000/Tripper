@@ -15,158 +15,158 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/toolbar_setup_profile">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/layout_constraint_setup_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/image_setup_profile"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_marginTop="32dp"
-            android:src="@drawable/profile_icon"
-            app:civ_border_color="@color/app_color"
-            app:civ_border_width="3dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/layout_constraint_setup_profile"/>
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/image_setup_profile"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginTop="32dp"
+                android:src="@drawable/profile_icon"
+                app:civ_border_color="@color/app_color"
+                app:civ_border_width="3dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/layout_constraint_setup_profile" />
 
-        <EditText
-            android:id="@+id/edit_setup_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/edittext_style"
-            android:ems="10"
-            android:hint="Name"
-            android:inputType="text"
-            android:padding="10dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_setup_profile" />
+            <EditText
+                android:id="@+id/edit_setup_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/edittext_style"
+                android:ems="10"
+                android:hint="Name"
+                android:inputType="text"
+                android:padding="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/image_setup_profile" />
 
-        <EditText
-            android:id="@+id/edit_setup_age"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/edittext_style"
-            android:ems="10"
-            android:hint="Age"
-            android:inputType="number"
-            android:padding="10dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_setup_name" />
+            <EditText
+                android:id="@+id/edit_setup_age"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edittext_style"
+                android:ems="10"
+                android:hint="Age"
+                android:inputType="number"
+                android:padding="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_setup_name" />
 
-        <Spinner
-            android:id="@+id/spinner_setup_gender"
-            android:layout_width="209dp"
-            android:layout_height="43dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/edittext_style"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_phone_number" />
+            <Spinner
+                android:id="@+id/spinner_setup_gender"
+                android:layout_width="209dp"
+                android:layout_height="43dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edittext_style"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_phone_number" />
 
-        <com.nex3z.flowlayout.FlowLayout
-            android:id="@+id/flowlayout_interests"
-            android:layout_width="208dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/edittext_style"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_setup_place" />
+            <com.nex3z.flowlayout.FlowLayout
+                android:id="@+id/flowlayout_interests"
+                android:layout_width="208dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/edittext_style"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_setup_place" />
 
-        <AutoCompleteTextView
-            android:id="@+id/edit_setup_place"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/edittext_style"
-            android:ems="10"
-            android:focusable="false"
-            android:hint="Place of Birth"
-            android:inputType="text"
-            android:padding="10dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_setup_date" />
+            <AutoCompleteTextView
+                android:id="@+id/edit_setup_place"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edittext_style"
+                android:ems="10"
+                android:focusable="false"
+                android:hint="Place of Birth"
+                android:inputType="text"
+                android:padding="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_setup_date" />
 
-        <TextView
-            android:id="@+id/text_add_interests"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="4dp"
-            android:text="*Insert your interests"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/flowlayout_interests" />
+            <TextView
+                android:id="@+id/text_add_interests"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:text="*Insert your interests"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/flowlayout_interests" />
 
-        <ImageButton
-            android:id="@+id/button_profile_add_interests"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/button_style"
-            android:src="@drawable/add_icon"
-            app:layout_constraintStart_toEndOf="@+id/flowlayout_interests"
-            app:layout_constraintTop_toBottomOf="@+id/edit_setup_place" />
+            <ImageButton
+                android:id="@+id/button_profile_add_interests"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/button_style"
+                android:src="@drawable/add_icon"
+                app:layout_constraintStart_toEndOf="@+id/flowlayout_interests"
+                app:layout_constraintTop_toBottomOf="@+id/edit_setup_place" />
 
-        <EditText
-            android:id="@+id/edit_setup_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/edittext_style"
-            android:clickable="true"
-            android:ems="10"
-            android:focusable="false"
-            android:hint="Date of Birth"
-            android:inputType="date"
-            android:padding="10dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinner_setup_gender" />
+            <EditText
+                android:id="@+id/edit_setup_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/edittext_style"
+                android:clickable="true"
+                android:ems="10"
+                android:focusable="false"
+                android:hint="Date of Birth"
+                android:inputType="date"
+                android:padding="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinner_setup_gender" />
 
 
+            <TextView
+                android:id="@+id/text_select_gender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:text="Select your gender"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinner_setup_gender" />
 
-        <TextView
-            android:id="@+id/text_select_gender"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text="Select your gender"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/spinner_setup_gender" />
+            <TextView
+                android:id="@+id/text_set_image_profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Open to set an image"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/image_setup_profile" />
 
-        <TextView
-            android:id="@+id/text_set_image_profile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Open to set an image"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/image_setup_profile" />
-
-        <EditText
-            android:id="@+id/edit_phone_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/edittext_style"
-            android:ems="10"
-            android:hint="Phone Number"
-            android:inputType="phone"
-            android:padding="10dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_setup_age" />
+            <EditText
+                android:id="@+id/edit_phone_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/edittext_style"
+                android:ems="10"
+                android:hint="Phone Number"
+                android:inputType="phone"
+                android:padding="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edit_setup_age" />
 
             <Button
                 android:id="@+id/button_setup_save_profile"

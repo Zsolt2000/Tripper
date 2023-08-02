@@ -17,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,12 +34,15 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.nex3z.flowlayout.FlowLayout;
@@ -52,6 +56,7 @@ import com.zsolt.licenta.Models.Trips;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.R;
 import com.zsolt.licenta.Utils.AddInterestsDialogListener;
+
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -70,15 +75,14 @@ public class SetupProfileActivity extends AppCompatActivity implements AddIntere
     private Button buttonSetupProfile;
     private FlowLayout flowLayoutInterests;
     private Spinner spinnerGender;
-    private TextView textAddInterests, textAddProfileImage, textSelectGender;
     private Toolbar toolbar;
     private ActionBar actionbar;
-    private PlacesClient placesClient;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
     private FirebaseUser firebaseUser;
+    private PlacesClient placesClient;
     private boolean hasImage = false;
     private Users currentUser;
 
@@ -94,6 +98,7 @@ public class SetupProfileActivity extends AppCompatActivity implements AddIntere
         setupDateOfBirth();
         setupLocation();
         setupInterests();
+        setupDeviceToken();
         setupProfile();
         setupFirebase();
         getApiKey();
@@ -102,6 +107,12 @@ public class SetupProfileActivity extends AppCompatActivity implements AddIntere
 
 
     }
+
+    private void setupDeviceToken()
+    {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> currentUser.setDeviceToken(task.getResult()));
+    }
+
 
     private void setupFlowLayout(List<Interests> interestsList) {
         flowLayoutInterests.setChildSpacing(5);
@@ -130,12 +141,6 @@ public class SetupProfileActivity extends AppCompatActivity implements AddIntere
                 currentUser.setName(editName.getText().toString());
                 currentUser.setPhoneNumber(editPhoneNumber.getText().toString());
                 currentUser.setAge(Integer.parseInt(editAge.getText().toString()));
-
-                //String imageName = null;
-                String dateOfBirth = editDateOfBirth.getText().toString();
-                String location = editPlaceOfBirth.getText().toString();
-                int age = Integer.parseInt(editAge.getText().toString());
-                HashMap<Integer, Trips> trips = new HashMap<>();
                 if (hasImage) {
                     UUID randomID = UUID.randomUUID();
                     String imageName = randomID + ".jpg";
@@ -146,6 +151,22 @@ public class SetupProfileActivity extends AppCompatActivity implements AddIntere
                     });
                 }
                 databaseReference.child("Users").child(currentUser.getUid()).setValue(currentUser).addOnSuccessListener(unused -> {
+                    FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+                        @Override
+                        public void onComplete(@NonNull Task<String> task) {
+                            if(!task.isSuccessful()){
+                                Toast.makeText(SetupProfileActivity.this, "Messaging failed", Toast.LENGTH_SHORT).show();
+                                return;
+                            }else{
+                                String token=task.getResult();
+                                Toast.makeText(SetupProfileActivity.this, "Successfully created your profile", Toast.LENGTH_SHORT).show();
+                                Intent mainActivity = new Intent(SetupProfileActivity.this, MainMenuActivity.class);
+                                startActivity(mainActivity);
+                                finish();
+                            }
+
+                        }
+                    });
                     Toast.makeText(this, "Successfully created your profile", Toast.LENGTH_SHORT).show();
                     Intent mainActivity = new Intent(SetupProfileActivity.this, MainMenuActivity.class);
                     startActivity(mainActivity);
@@ -154,7 +175,6 @@ public class SetupProfileActivity extends AppCompatActivity implements AddIntere
             }
         });
     }
-
     private boolean validProfile() {
         String name = editName.getText().toString();
         String phoneNumber = editPhoneNumber.getText().toString();
@@ -247,10 +267,7 @@ public class SetupProfileActivity extends AppCompatActivity implements AddIntere
         editPlaceOfBirth = findViewById(R.id.edit_setup_place);
         flowLayoutInterests = findViewById(R.id.flowlayout_interests);
         buttonAddInterests = findViewById(R.id.button_profile_add_interests);
-        textAddInterests = findViewById(R.id.text_add_interests);
         buttonSetupProfile = findViewById(R.id.button_setup_save_profile);
-        textAddProfileImage = findViewById(R.id.text_setup_profile);
-        textSelectGender = findViewById(R.id.text_select_gender);
         editPhoneNumber = findViewById(R.id.edit_phone_number);
     }
 

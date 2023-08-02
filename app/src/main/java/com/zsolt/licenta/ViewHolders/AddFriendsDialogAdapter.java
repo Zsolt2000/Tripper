@@ -2,6 +2,7 @@ package com.zsolt.licenta.ViewHolders;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,8 +10,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 import com.zsolt.licenta.Utils.AddFriendsDialogListener;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.R;
@@ -44,12 +47,8 @@ public class AddFriendsDialogAdapter extends RecyclerView.Adapter<AddFriendsDial
 
         Users user = friendsList.get(position);
         holder.getTextProfileName().setText(user.getName());
-        String imagePath = "Images/" + user.getProfileImage();
-        final long IMAGE_SIZE = 1024 * 1024;
-        storageReference.child(imagePath).getBytes(IMAGE_SIZE).addOnSuccessListener(bytes -> {
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-            holder.getImageProfile().setImageBitmap(bitmap);
-        });
+        storageReference.child("Images/" + user.getProfileImage()).getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).placeholder(R.drawable.profile_icon).into(holder.getImageProfile()));
+
         holder.itemView.setOnClickListener(v -> listener.addFriendtoRecyclerView(user));
     }
 
