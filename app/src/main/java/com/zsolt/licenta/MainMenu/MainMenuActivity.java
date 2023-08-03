@@ -58,6 +58,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
+import com.zsolt.licenta.Activities.FriendsListActivity;
 import com.zsolt.licenta.Activities.PersonalProfileActivity;
 import com.zsolt.licenta.Activities.UserProfileActivity;
 import com.zsolt.licenta.Login.LoginActivity;
@@ -178,10 +179,8 @@ public class MainMenuActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Your trips was pressed", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.nav_friend_list:
-                    Toast.makeText(getApplicationContext(), "Friends list was pressed", Toast.LENGTH_SHORT).show();
-                    break;
-                case R.id.nav_settings:
-                    Toast.makeText(getApplicationContext(), "Settings was pressed", Toast.LENGTH_SHORT).show();
+                    Intent friendsListActivity=new Intent(MainMenuActivity.this, FriendsListActivity.class);
+                    startActivity(friendsListActivity);
                     break;
                 case R.id.nav_logout:
                     FirebaseAuth.getInstance().signOut();

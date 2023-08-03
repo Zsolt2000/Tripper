@@ -1,6 +1,7 @@
 package com.zsolt.licenta.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.FragmentActivity;
 
 import android.app.Fragment;
@@ -34,6 +35,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private SupportMapFragment supportMapFragment;
     private Button buttonSelectLocation;
     private MarkerOptions markerOptions;
+    private String ceva="lol";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

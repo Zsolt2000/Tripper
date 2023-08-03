@@ -1,7 +1,7 @@
 package com.zsolt.licenta.ViewHolders;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,43 +14,47 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+import com.zsolt.licenta.Activities.UserProfileActivity;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.R;
-import com.zsolt.licenta.Utils.AddFriendsDialogListener;
 
 import java.util.List;
 
-public class AddFriendsAdapter extends RecyclerView.Adapter<AddFriendsViewHolder> {
-    private final List<Users> friendsList;
+public class FriendListAdapter extends RecyclerView.Adapter<FriendListViewHolder> {
+    private List<Users> friendsList;
     private View itemView;
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
-    private AddFriendsDialogListener listener;
+    private Context context;
 
-    public AddFriendsAdapter(List<Users> friendsList, AddFriendsDialogListener listener) {
+    public FriendListAdapter(Context context,List<Users> friendsList) {
         this.friendsList = friendsList;
-        this.listener = listener;
+        this.context=context;
+
     }
 
 
     @NonNull
     @Override
-    public AddFriendsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.custom_add_friends_activity, parent, false);
+    public FriendListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.custom_friends_list_item, parent, false);
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
-        return new AddFriendsViewHolder(itemView);
+        return new FriendListViewHolder(itemView);
     }
 
-
     @Override
-    public void onBindViewHolder(@NonNull AddFriendsViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull FriendListViewHolder holder, int position) {
         Users user = friendsList.get(position);
-        holder.getTextProfileName().setText(user.getName());
+        holder.getTextFriendName().setText(user.getName());
         storageReference.child("Images/" + user.getProfileImage()).getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).placeholder(R.drawable.profile_icon).into(holder.getImageProfile()));
-        holder.getButtonRemoveFriend().setOnClickListener(v -> {
-            friendsList.remove(holder.getAdapterPosition());
-            notifyDataSetChanged();
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent userProfile=new Intent(context, UserProfileActivity.class);
+                userProfile.putExtra("selectedUser",user);
+                context.startActivity(userProfile);
+            }
         });
     }
 
@@ -58,14 +62,4 @@ public class AddFriendsAdapter extends RecyclerView.Adapter<AddFriendsViewHolder
     public int getItemCount() {
         return friendsList.size();
     }
-
-    public Users getItem(int position) {
-        return friendsList.get(position);
-    }
-
-    public List<Users> getFriendsList() {
-        return friendsList;
-    }
-
-
 }

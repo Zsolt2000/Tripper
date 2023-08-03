@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -31,13 +33,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.gson.Gson;
 import com.zsolt.licenta.Activities.MapActivity;
+import com.zsolt.licenta.Models.Trips;
 import com.zsolt.licenta.Utils.AddFriendsDialogListener;
 import com.zsolt.licenta.CustomViews.AddFriendDialogFragment;
 import com.zsolt.licenta.Models.TripType;
@@ -49,6 +55,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -91,11 +98,56 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
         buttonAddTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (validTrip()) {
+                    String tripTitle = editTripTitle.getText().toString();
+                    String tripLocation = editAddLocation.getText().toString();
+                    String tripStartDate = editStartDate.getText().toString();
+                    Users tripCreator = getCurrentUser();
+                    int numberOfPeople = Integer.parseInt(editNumberOfPeople.getText().toString());
+                    List<Users> invitedPeople = addFriendsAdapter.getFriendsList();
+                    Trips trip = new Trips(tripTitle, tripCreator, tripStartDate, numberOfPeople, tripLocation, invitedPeople);
+                    saveTrip(trip);
+                }
             }
         });
 
     }
+
+    private boolean validTrip() {
+        if (editTripTitle.getText().toString().isEmpty() ||
+                editAddLocation.getText().toString().isEmpty() ||
+                editStartDate.getText().toString().isEmpty() || addFriendsAdapter.getItemCount() < 0) {
+            Toast.makeText(this, "Please fill in the fields", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
+    }
+
+
+    private void saveTrip(Trips trip) {
+        HashMap<String, Object> tripsHashMap = new HashMap<>();
+        String currentUserNode = "/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/tripsList/" + trip.getTitle();
+        tripsHashMap.put(currentUserNode,trip);
+        for (int i = 0; i < trip.getInvitedUsers().size(); i++) {
+            String invitedUserNode ="/"+trip.getInvitedUsers().get(i).getUid()+"/tripslist/"+trip.getTitle();
+            tripsHashMap.put(invitedUserNode,trip);
+        }
+        databaseReference.child("Users").updateChildren(tripsHashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Toast.makeText(AddTripActivity.this, "Succesfully saved trip", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    private Users getCurrentUser() {
+        SharedPreferences sharedPreferences = getSharedPreferences("TripperPreference", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String defaultValue = "";
+        return gson.fromJson(sharedPreferences.getString("currentUser", defaultValue), Users.class);
+    }
+
 
     private void setupRecyclerView() {
         friendList = new ArrayList<>();

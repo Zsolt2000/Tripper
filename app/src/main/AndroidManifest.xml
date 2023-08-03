@@ -20,6 +20,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         tools:targetApi="31">
+        <activity
+            android:name=".Activities.FriendsListActivity"
+            android:exported="false" />
+
         <service
             android:name=".Notifications.TripperMessagingService"
             android:exported="true">
