@@ -90,7 +90,7 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
         setLayoutReadOnly(layoutPersonalProfile, false);
         setupFirebase();
         setupToolbar();
-        setupProfile();
+        //setupProfile();
         setupAddInterests();
         setupDateOfBirth();
         setupLocation();
@@ -237,7 +237,7 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
     }
 
 
-    private void setupFirebase(){
+    private void setupFirebase() {
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
         databaseReference = firebaseDatabase.getReference();
@@ -261,7 +261,7 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
+        setupProfile();
         getMenuInflater().inflate(R.menu.edit_profile_menu, menu);
         MenuItem menuItem = menu.findItem(R.id.edit_profile);
         menuItem.setActionView(R.layout.custom_settings_profile);

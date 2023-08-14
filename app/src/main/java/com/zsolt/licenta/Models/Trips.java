@@ -1,9 +1,15 @@
 package com.zsolt.licenta.Models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class Trips {
+public class Trips implements Serializable,Parcelable {
     private String title;
     private Users creator;
     private String startDate;
@@ -11,14 +17,30 @@ public class Trips {
     private String location;
     private List<Users> invitedUsers;
 
-    public Trips(String title, Users creator, String startDate, int numberOfPeople, String location, List<Users> invitedUsers) {
+    private TripType tripType;
+
+    private boolean isPrivate;
+
+    public Trips(String title, Users creator, String startDate, int numberOfPeople, boolean isPrivate,String location, List<Users> invitedUsers,TripType triptype) {
         this.title = title;
         this.creator = creator;
         this.startDate = startDate;
         this.numberOfPeople = numberOfPeople;
         this.location = location;
         this.invitedUsers = invitedUsers;
+        this.isPrivate=isPrivate;
+        this.tripType=triptype;
     }
+    public Trips(){}
+
+    protected Trips(Parcel in) {
+        title = in.readString();
+        startDate = in.readString();
+        numberOfPeople = in.readInt();
+        location = in.readString();
+        isPrivate = in.readByte() != 0;
+    }
+
 
     public String getTitle() {
         return title;
@@ -68,15 +90,59 @@ public class Trips {
         this.invitedUsers = invitedUsers;
     }
 
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public void setPrivate(boolean aPrivate) {
+        isPrivate = aPrivate;
+    }
+
+    public TripType getTripType() {
+        return tripType;
+    }
+
+    public void setTripType(TripType tripType) {
+        this.tripType = tripType;
+    }
+
     @Override
     public String toString() {
         return "Trips{" +
                 "title='" + title + '\'' +
                 ", creator=" + creator +
-                ", startDate=" + startDate +
+                ", startDate='" + startDate + '\'' +
                 ", numberOfPeople=" + numberOfPeople +
                 ", location='" + location + '\'' +
                 ", invitedUsers=" + invitedUsers +
+                ", isPrivate=" + isPrivate +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeString(startDate);
+        dest.writeInt(numberOfPeople);
+        dest.writeString(location);
+        dest.writeByte((byte) (isPrivate ? 1 : 0));
+    }
+
+
+    public static final Creator<Trips> CREATOR = new Creator<Trips>() {
+        @Override
+        public Trips createFromParcel(Parcel in) {
+            return new Trips(in);
+        }
+
+        @Override
+        public Trips[] newArray(int size) {
+            return new Trips[size];
+        }
+    };
 }

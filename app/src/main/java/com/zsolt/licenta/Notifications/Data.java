@@ -1,51 +1,16 @@
 package com.zsolt.licenta.Notifications;
 
+import com.zsolt.licenta.Models.NotificationType;
 import com.zsolt.licenta.Models.Users;
 
+import java.util.List;
+
 public class Data {
-    private String Title,Message,sender,destination;
+    private String destination;
+    private NotificationType notificationType;
 
-
-
-    private Users user;
-
-    public Data(String title, String message,String sender) {
-        this.Title = title;
-        this.Message = message;
-        this.sender=sender;
-    }
-
-    public Data(String sender,String destination) {
-        this.sender=sender;
+    public Data(String destination,NotificationType notificationType) {
         this.destination=destination;
+        this.notificationType=notificationType;
     }
-
-
-    public Data() {
-    }
-
-    public String getTitle() {
-        return Title;
-    }
-
-    public void setTitle(String title) {
-        Title = title;
-    }
-
-    public String getMessage() {
-        return Message;
-    }
-
-    public void setMessage(String message) {
-        Message = message;
-    }
-
-    public Users getUser() {
-        return user;
-    }
-
-    public void setUser(Users user) {
-        this.user = user;
-    }
-
 }

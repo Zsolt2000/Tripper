@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -33,17 +34,26 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.zsolt.licenta.Activities.MapActivity;
+import com.zsolt.licenta.Models.NotificationType;
 import com.zsolt.licenta.Models.Trips;
+import com.zsolt.licenta.Notifications.Data;
+import com.zsolt.licenta.Notifications.MyResponse;
+import com.zsolt.licenta.Notifications.NotificationSender;
+import com.zsolt.licenta.Notifications.RetrofitClient;
+import com.zsolt.licenta.Notifications.TripperMessagingData;
 import com.zsolt.licenta.Utils.AddFriendsDialogListener;
 import com.zsolt.licenta.CustomViews.AddFriendDialogFragment;
 import com.zsolt.licenta.Models.TripType;
@@ -59,6 +69,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class AddTripActivity extends AppCompatActivity implements AddFriendsDialogListener {
     private Toolbar toolbar;
     private ActionBar actionbar;
@@ -73,11 +87,12 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
     private PlacesClient placesClient;
     private FirebaseStorage firebaseStorage;
     private DatabaseReference databaseReference;
-    private TripType tripType;
     private List<TripType> tripTypeList;
     private AddFriendDialogFragment fragment;
     private AddFriendsAdapter addFriendsAdapter;
     private List<Users> friendList;
+    private TripperMessagingData tripperMessagingData;
+    private TripType tripType;
 
 
     @Override
@@ -95,19 +110,41 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
         setupAddPeopleDialog();
         setupRecyclerView();
         getApiKey();
-        buttonAddTrip.setOnClickListener(new View.OnClickListener() {
+        setupAddTrip();
+    }
+
+    private void setupAddTrip() {
+        buttonAddTrip.setOnClickListener(v -> {
+            tripperMessagingData = RetrofitClient.getClient("https://fcm.googleapis.com/").create(TripperMessagingData.class);
+            if (validTrip()) {
+                String tripTitle = editTripTitle.getText().toString();
+                String tripLocation = editAddLocation.getText().toString();
+                String tripStartDate = editStartDate.getText().toString();
+
+                Users tripCreator = getCurrentUser();
+                boolean isPrivate = switchTripVisibility.isChecked();
+                int numberOfPeople = Integer.parseInt(editNumberOfPeople.getText().toString());
+                List<Users> invitedPeople = addFriendsAdapter.getFriendsList();
+                Trips trip = new Trips(tripTitle, tripCreator, tripStartDate, numberOfPeople, isPrivate, tripLocation, invitedPeople, tripType);
+                saveTrip(trip);
+            }
+        });
+    }
+
+    private void sendNotification(String userToken, String tripTitle) {
+        Data data = new Data(tripTitle, NotificationType.NEW_TRIP);
+        NotificationSender notificationSender = new NotificationSender(data, userToken);
+        tripperMessagingData.sendNotification(notificationSender).enqueue(new Callback<MyResponse>() {
             @Override
-            public void onClick(View v) {
-                if (validTrip()) {
-                    String tripTitle = editTripTitle.getText().toString();
-                    String tripLocation = editAddLocation.getText().toString();
-                    String tripStartDate = editStartDate.getText().toString();
-                    Users tripCreator = getCurrentUser();
-                    int numberOfPeople = Integer.parseInt(editNumberOfPeople.getText().toString());
-                    List<Users> invitedPeople = addFriendsAdapter.getFriendsList();
-                    Trips trip = new Trips(tripTitle, tripCreator, tripStartDate, numberOfPeople, tripLocation, invitedPeople);
-                    saveTrip(trip);
-                }
+            public void onResponse(Call<MyResponse> call, Response<MyResponse> response) {
+                if (response.code() == 200)
+                    if (response.body().success != 1)
+                        Toast.makeText(AddTripActivity.this, "Failed to send notification", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<MyResponse> call, Throwable t) {
+
             }
         });
 
@@ -125,17 +162,17 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
 
 
     private void saveTrip(Trips trip) {
-        HashMap<String, Object> tripsHashMap = new HashMap<>();
-        String currentUserNode = "/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/tripsList/" + trip.getTitle();
-        tripsHashMap.put(currentUserNode,trip);
-        for (int i = 0; i < trip.getInvitedUsers().size(); i++) {
-            String invitedUserNode ="/"+trip.getInvitedUsers().get(i).getUid()+"/tripslist/"+trip.getTitle();
-            tripsHashMap.put(invitedUserNode,trip);
-        }
-        databaseReference.child("Users").updateChildren(tripsHashMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+
+        databaseReference.child("Trips").child(trip.getTitle()).setValue(trip).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
-            public void onSuccess(Void unused) {
-                Toast.makeText(AddTripActivity.this, "Succesfully saved trip", Toast.LENGTH_SHORT).show();
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Toast.makeText(AddTripActivity.this, "Succesfully saved trip", Toast.LENGTH_SHORT).show();
+                    for (int i = 0; i < trip.getInvitedUsers().size(); i++) {
+                        sendNotification(trip.getInvitedUsers().get(i).getDeviceToken(), trip.getTitle());
+                    }
+                    finish();
+                }
             }
         });
     }
@@ -152,8 +189,10 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
     private void setupRecyclerView() {
         friendList = new ArrayList<>();
         recyclerInvitedPeople.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        addFriendsAdapter = new AddFriendsAdapter(friendList, this);
+        addFriendsAdapter = new AddFriendsAdapter(friendList, this, this);
+        addFriendsAdapter.setRemovable(true);
         recyclerInvitedPeople.setAdapter(addFriendsAdapter);
+
     }
 
     private void setupAddPeopleDialog() {
@@ -209,6 +248,7 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
     private void setupAddLocation() {
         editAddLocation.setOnClickListener(view -> {
             Intent mapActivity = new Intent(AddTripActivity.this, MapActivity.class);
+            mapActivity.putExtra("trip", "creator");
             activityResultLauncher.launch(mapActivity);
         });
     }
@@ -269,16 +309,16 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
 
     private void setupViews() {
         toolbar = findViewById(R.id.toolbar_add_trip);
-        editAddLocation = findViewById(R.id.edit_location);
+        editAddLocation = findViewById(R.id.edit_view_location);
         editTripTitle = findViewById(R.id.edit_trip_title);
-        editStartDate = findViewById(R.id.edit_start_date);
-        editNumberOfPeople = findViewById(R.id.edit_number_people);
-        spinnerTripType = findViewById(R.id.spinner_trip_type);
-        recyclerInvitedPeople = findViewById(R.id.recycler_add_people);
-        switchTripVisibility = findViewById(R.id.switch_trip_visibility);
-        textTripVisibility = findViewById(R.id.text_trip_visibility);
-        buttonAddTrip = findViewById(R.id.button_add_trip);
-        buttonAddPeople = findViewById(R.id.button_add_people);
+        editStartDate = findViewById(R.id.edit_view_start_date);
+        editNumberOfPeople = findViewById(R.id.edit_view_number_people);
+        spinnerTripType = findViewById(R.id.spinner_view_trip_type);
+        recyclerInvitedPeople = findViewById(R.id.recyclerview_view_add_people);
+        switchTripVisibility = findViewById(R.id.switch_view_trip_visibility);
+        textTripVisibility = findViewById(R.id.text_view_trip_visibility);
+        buttonAddTrip = findViewById(R.id.button_view_add_trip);
+        buttonAddPeople = findViewById(R.id.button_view_add_people);
     }
 
     private void setupToolbar() {

@@ -35,27 +35,36 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private SupportMapFragment supportMapFragment;
     private Button buttonSelectLocation;
     private MarkerOptions markerOptions;
-    private String ceva="lol";
+    private String userPrivilege, pinnedLocation;
+    private AutocompleteSupportFragment autocompleteSupportFragment;
+    private boolean isGuest, isEditable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         buttonSelectLocation = findViewById(R.id.button_select_location);
+        userPrivilege = getIntent().getStringExtra("trip");
+        pinnedLocation = getIntent().getStringExtra("location");
+        isEditable = getIntent().getBooleanExtra("editable", true);
         setupMap();
+        setupSelectLocation();
+    }
+
+    private void setupSelectLocation() {
         buttonSelectLocation.setOnClickListener(v -> {
-            List<Address>addressList;
-            LatLng markerPosition=markerOptions.getPosition();
-            Geocoder geocoder=new Geocoder(MapActivity.this);
+            List<Address> addressList;
+            LatLng markerPosition = markerOptions.getPosition();
+            Geocoder geocoder = new Geocoder(MapActivity.this);
             try {
-                addressList=geocoder.getFromLocation(markerPosition.latitude,markerPosition.longitude,1);
+                addressList = geocoder.getFromLocation(markerPosition.latitude, markerPosition.longitude, 1);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            Address address=addressList.get(0);
-            Intent intent=new Intent();
-            intent.putExtra("Location",address);
-            setResult(RESULT_OK,intent);
+            Address address = addressList.get(0);
+            Intent intent = new Intent();
+            intent.putExtra("Location", address);
+            setResult(RESULT_OK, intent);
             finish();
         });
     }
@@ -64,28 +73,30 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         supportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map_fragment);
         supportMapFragment.getMapAsync(this);
 
-        AutocompleteSupportFragment autocompleteFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+        autocompleteSupportFragment = (AutocompleteSupportFragment) getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteSupportFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME));
+        autocompleteSupportFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(@NonNull Place place) {
-                map.clear();
-                List<Address> addressList;
-                Geocoder geocoder = new Geocoder(MapActivity.this);
-                try {
-                    addressList = geocoder.getFromLocationName(place.getName(), 10);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                if (addressList.size() > 0) {
-                    Address address = addressList.get(0);
-                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                    markerOptions=new MarkerOptions().position(latLng);
-                    map.addMarker(markerOptions);
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
-                    buttonSelectLocation.setVisibility(View.VISIBLE);
-                } else {
-                    Toast.makeText(MapActivity.this, "Can't find this location", Toast.LENGTH_SHORT).show();
+                if (!isGuest) {
+                    map.clear();
+                    List<Address> addressList;
+                    Geocoder geocoder = new Geocoder(MapActivity.this);
+                    try {
+                        addressList = geocoder.getFromLocationName(place.getName(), 10);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    if (addressList.size() > 0) {
+                        Address address = addressList.get(0);
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        markerOptions = new MarkerOptions().position(latLng);
+                        map.addMarker(markerOptions);
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                        buttonSelectLocation.setVisibility(View.VISIBLE);
+                    } else {
+                        Toast.makeText(MapActivity.this, "Can't find this location", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 
@@ -99,13 +110,52 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
-        map.setOnMapClickListener(latLng -> {
-            markerOptions = new MarkerOptions().position(latLng);
-            map.clear();
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
-            map.addMarker(markerOptions);
-            buttonSelectLocation.setVisibility(View.VISIBLE);
-        });
+        if (userPrivilege != null && pinnedLocation != null) {
+            if (userPrivilege.equals("guest")) {
+                buttonSelectLocation.setVisibility(View.GONE);
+                autocompleteSupportFragment.getView().setVisibility(View.GONE);
+                isGuest = true;
+            } else {
+                if (isEditable) {
+                    buttonSelectLocation.setVisibility(View.VISIBLE);
+                    autocompleteSupportFragment.getView().setVisibility(View.VISIBLE);
+                    map.setOnMapClickListener(latLng -> {
+                        markerOptions = new MarkerOptions().position(latLng);
+                        map.clear();
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                        map.addMarker(markerOptions);
+                        buttonSelectLocation.setVisibility(View.VISIBLE);
+                    });}
+                else{
+                    buttonSelectLocation.setVisibility(View.GONE);
+                    autocompleteSupportFragment.getView().setVisibility(View.GONE);
+                }
+            }
 
+                List<Address> addressList;
+                Geocoder geocoder = new Geocoder(MapActivity.this);
+                try {
+                    addressList = geocoder.getFromLocationName(pinnedLocation, 10);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                if (addressList.size() > 0) {
+                    Address address = addressList.get(0);
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    markerOptions = new MarkerOptions().position(latLng);
+                    map.addMarker(markerOptions);
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                } else {
+                    Toast.makeText(MapActivity.this, "Can't find this location", Toast.LENGTH_SHORT).show();
+                }
+            }else{
+            map.setOnMapClickListener(latLng -> {
+                markerOptions = new MarkerOptions().position(latLng);
+                map.clear();
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
+                map.addMarker(markerOptions);
+                buttonSelectLocation.setVisibility(View.VISIBLE);
+            });
+        }
+        }
     }
-}

@@ -32,6 +32,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.nex3z.flowlayout.FlowLayout;
 import com.squareup.picasso.Picasso;
+import com.zsolt.licenta.Models.NotificationType;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.Notifications.Data;
 import com.zsolt.licenta.Notifications.RetrofitClient;
@@ -87,8 +88,9 @@ public class UserProfileActivity extends AppCompatActivity {
                 buttonStartChat.setVisibility(View.GONE);
                 updateFriendList(false);
             } else {
-                String token = selectedUser.getDeviceToken();
-                sendNotifications(token, FirebaseAuth.getInstance().getUid());
+                String userDeviceToken = selectedUser.getDeviceToken();
+                String userUid=getCurrentUser().getUid();
+                sendNotifications(userDeviceToken,userUid);
                 updateFriendList(true);
                 buttonAddFriend.setText("Remove friend");
                 buttonStartChat.setVisibility(View.VISIBLE);
@@ -98,19 +100,16 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void verifyIfFriend() {
-        databaseReference.child("Users").child(FirebaseAuth.getInstance().getUid()).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
-            @Override
-            public void onSuccess(DataSnapshot dataSnapshot) {
-                Users currentUser = dataSnapshot.getValue(Users.class);
-                if (currentUser.getFriendsList() == null) {
-                    buttonAddFriend.setText("Add friend");
-                    buttonStartChat.setVisibility(View.GONE);
-                    isFriend = false;
-                } else if (currentUser.getFriendsList().containsKey(selectedUser.getUid())) {
-                    buttonAddFriend.setText("Remove friend");
-                    buttonStartChat.setVisibility(View.VISIBLE);
-                    isFriend = true;
-                }
+        databaseReference.child("Users").child(FirebaseAuth.getInstance().getUid()).get().addOnSuccessListener(dataSnapshot -> {
+            Users currentUser = dataSnapshot.getValue(Users.class);
+            if (currentUser.getFriendsList() == null) {
+                buttonAddFriend.setText("Add friend");
+                buttonStartChat.setVisibility(View.GONE);
+                isFriend = false;
+            } else if (currentUser.getFriendsList().containsKey(selectedUser.getUid())) {
+                buttonAddFriend.setText("Remove friend");
+                buttonStartChat.setVisibility(View.VISIBLE);
+                isFriend = true;
             }
         });
     }
@@ -124,18 +123,12 @@ public class UserProfileActivity extends AppCompatActivity {
         if (friendState) {
             usersMap.put(selectedUserNode, getCurrentUser());
             usersMap.put(currentUserNode, selectedUser);
-            databaseReference.child("Users").updateChildren(usersMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void unused) {
-                }
+            databaseReference.child("Users").updateChildren(usersMap).addOnSuccessListener(unused -> {
             });
         } else {
             usersMap.put(selectedUserNode, null);
             usersMap.put(currentUserNode, null);
-            databaseReference.child("Users").updateChildren(usersMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void unused) {
-                }
+            databaseReference.child("Users").updateChildren(usersMap).addOnSuccessListener(unused -> {
             });
         }
     }
@@ -148,8 +141,8 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
 
-    private void sendNotifications(String userToken, String senderUid) {
-        Data data = new Data(selectedUser.getUid(), senderUid);
+    private void sendNotifications(String userToken,String userUID) {
+        Data data = new Data(userUID, NotificationType.FRIEND_REQUEST);
         NotificationSender sender = new NotificationSender(data, userToken);
         tripperMessagingData.sendNotification(sender).enqueue(new Callback<MyResponse>() {
             @Override
@@ -196,12 +189,7 @@ public class UserProfileActivity extends AppCompatActivity {
         textUserGender.setText(user.getGender().toString());
         textUserDate.setText(user.getDateOfBirth());
         textUserLocation.setText(user.getHomeLocation());
-        storageReference.child("Images/" + user.getProfileImage()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                Picasso.get().load(uri).placeholder(R.drawable.profile_icon).into(imageUserProfile);
-            }
-        });
+        storageReference.child("Images/" + user.getProfileImage()).getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).placeholder(R.drawable.profile_icon).into(imageUserProfile));
     }
 
     private void setupViews() {

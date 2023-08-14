@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.TripActivity">
+
+    <include
+        android:id="@+id/toolbar_trip"
+        layout="@layout/toolbar" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_trip">
+
+        <EditText
+            android:id="@+id/edit_view_trip_title"
+            android:layout_width="295dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edittext_style"
+            android:ems="10"
+            android:textColor="@drawable/custom_text_focusable_color"
+            android:hint="Trip title"
+            android:inputType="text"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/constraint_layout" />
+
+        <View
+            android:id="@+id/add_view_trip_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="16dp"
+            android:background="@color/quantum_grey"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edit_view_trip_title" />
+
+        <EditText
+            android:id="@+id/edit_view_start_date"
+            android:layout_width="208dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edittext_style"
+            android:textColor="@drawable/custom_text_focusable_color"
+            android:ems="10"
+            android:focusable="false"
+            android:hint="Start date"
+            android:inputType="text"
+            android:padding="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_view_location" />
+
+        <TextView
+            android:id="@+id/text_view_select_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:text="*Please select type of trip"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinner_view_trip_type" />
+
+        <EditText
+            android:id="@+id/edit_view_number_people"
+            android:layout_width="208dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="12dp"
+            android:textColor="@drawable/custom_text_focusable_color"
+            android:background="@drawable/edittext_style"
+            android:ems="10"
+            android:hint="Number of people"
+            android:inputType="number"
+            android:padding="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_view_select_type" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerview_view_add_people"
+            android:layout_width="208dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edittext_style"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/linear_layout" />
+
+        <ImageButton
+            android:id="@+id/button_view_add_people"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="72dp"
+            android:background="@drawable/button_style"
+            app:layout_constraintStart_toEndOf="@+id/recyclerview_view_add_people"
+            app:layout_constraintTop_toBottomOf="@+id/edit_view_number_people"
+            app:srcCompat="@drawable/add_icon" />
+
+        <TextView
+            android:id="@+id/text_view_add_people"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
+            android:text="*Invite people"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/recyclerview_view_add_people" />
+
+        <Spinner
+            android:id="@+id/spinner_view_trip_type"
+            android:layout_width="208dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edittext_style"
+            android:textColor="@drawable/custom_text_focusable_color"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_view_start_date" />
+
+        <EditText
+            android:id="@+id/edit_view_location"
+            android:tag="loaction"
+            android:layout_width="208dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edittext_style"
+            android:textColor="@drawable/custom_text_focusable_color"
+            android:ems="10"
+            android:focusable="false"
+            android:hint="Location"
+            android:inputType="text"
+            android:padding="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/add_view_trip_separator" />
+
+        <LinearLayout
+            android:id="@+id/linear_layout"
+            android:layout_width="208dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_view_number_people">
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_view_trip_visibility"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
+                android:id="@+id/text_view_trip_visibility"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:padding="8dp"
+                android:text="Public"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/button_view_join_trip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/button_style"
+        android:text="Join trip"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraint_layout" />
+
+    <Button
+        android:id="@+id/button_view_delete_trip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="52dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/button_style"
+        android:text="Delete Trip"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraint_layout" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

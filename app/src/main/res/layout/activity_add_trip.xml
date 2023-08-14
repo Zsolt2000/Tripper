@@ -26,7 +26,7 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar_add_trip" />
 
     <View
-        android:id="@+id/add_trip_separator"
+        android:id="@+id/add_view_trip_separator"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="16dp"
@@ -35,7 +35,7 @@
         android:background="@color/quantum_grey"/>
 
     <EditText
-        android:id="@+id/edit_start_date"
+        android:id="@+id/edit_view_start_date"
         android:layout_width="208dp"
         android:layout_height="45dp"
         android:layout_marginStart="16dp"
@@ -47,20 +47,20 @@
         android:focusable="false"
         android:padding="10dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_location" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_view_location" />
 
     <TextView
-        android:id="@+id/text_select_type"
+        android:id="@+id/text_view_select_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
         android:text="*Please select type of trip"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_trip_type" />
+        app:layout_constraintTop_toBottomOf="@+id/spinner_view_trip_type" />
 
     <EditText
-        android:id="@+id/edit_number_people"
+        android:id="@+id/edit_view_number_people"
         android:layout_width="208dp"
         android:layout_height="45dp"
         android:layout_marginStart="16dp"
@@ -71,10 +71,10 @@
         android:inputType="number"
         android:padding="10dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_select_type" />
+        app:layout_constraintTop_toBottomOf="@+id/text_view_select_type" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_add_people"
+        android:id="@+id/recyclerview_view_add_people"
         android:layout_width="208dp"
         android:layout_height="100dp"
         android:layout_marginStart="16dp"
@@ -84,28 +84,28 @@
         app:layout_constraintTop_toBottomOf="@+id/linear_layout" />
 
     <ImageButton
-        android:id="@+id/button_add_people"
+        android:id="@+id/button_view_add_people"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_marginStart="4dp"
         android:layout_marginTop="72dp"
         android:background="@drawable/button_style"
-        app:layout_constraintStart_toEndOf="@+id/recycler_add_people"
-        app:layout_constraintTop_toBottomOf="@+id/edit_number_people"
+        app:layout_constraintStart_toEndOf="@+id/recyclerview_view_add_people"
+        app:layout_constraintTop_toBottomOf="@+id/edit_view_number_people"
         app:srcCompat="@drawable/add_icon" />
 
     <TextView
-        android:id="@+id/textView6"
+        android:id="@+id/text_view_add_people"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
         android:text="*Invite people"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recycler_add_people" />
+        app:layout_constraintTop_toBottomOf="@+id/recyclerview_view_add_people" />
 
     <Spinner
-        android:id="@+id/spinner_trip_type"
+        android:id="@+id/spinner_view_trip_type"
         android:layout_width="208dp"
         android:layout_height="45dp"
         android:layout_marginStart="16dp"
@@ -113,10 +113,10 @@
         android:background="@drawable/edittext_style"
 
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_start_date" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_view_start_date" />
 
     <EditText
-        android:id="@+id/edit_location"
+        android:id="@+id/edit_view_location"
         android:layout_width="208dp"
         android:layout_height="45dp"
         android:layout_marginStart="16dp"
@@ -128,10 +128,10 @@
         android:padding="10dp"
         android:focusable="false"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/add_trip_separator" />
+        app:layout_constraintTop_toBottomOf="@+id/add_view_trip_separator" />
 
     <Button
-        android:id="@+id/button_add_trip"
+        android:id="@+id/button_view_add_trip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="644dp"
@@ -149,16 +149,16 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_number_people">
+        app:layout_constraintTop_toBottomOf="@+id/edit_view_number_people">
 
         <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switch_trip_visibility"
+            android:id="@+id/switch_view_trip_visibility"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <TextView
-            android:id="@+id/text_trip_visibility"
+            android:id="@+id/text_view_trip_visibility"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_vertical"

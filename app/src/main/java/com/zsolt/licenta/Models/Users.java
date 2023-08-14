@@ -2,6 +2,8 @@ package com.zsolt.licenta.Models;
 
 import android.media.Image;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,7 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-public class Users implements Serializable {
+public class Users implements Serializable{
 
 
     private String uid;
@@ -24,13 +26,12 @@ public class Users implements Serializable {
     private List<Interests> interests;
     private HashMap<String,Users> friendsList;
     private String deviceToken;
-    private List<Trips> tripsList;
     private Gender gender;
     private String profileImage;
     public Users() {
     }
 
-    public Users(String uid, String name, String phoneNumber, int age, String dateOfBirth, String homeLocation, List<Interests> interests, List< Trips> tripsList, String profileImage, Gender gender,HashMap<String,Users>friendsList,String deviceToken) {
+    public Users(String uid, String name, String phoneNumber, int age, String dateOfBirth, String homeLocation, List<Interests> interests, String profileImage, Gender gender,HashMap<String,Users>friendsList,String deviceToken) {
         this.uid = uid;
         this.name = name;
         this.phoneNumber = phoneNumber;
@@ -38,11 +39,22 @@ public class Users implements Serializable {
         this.dateOfBirth = dateOfBirth;
         this.homeLocation = homeLocation;
         this.interests = interests;
-        this.tripsList = tripsList;
         this.gender = gender;
         this.profileImage = profileImage;
         this.deviceToken=deviceToken;
         this.friendsList=friendsList;
+    }
+
+
+    protected Users(Parcel in) {
+        uid = in.readString();
+        name = in.readString();
+        phoneNumber = in.readString();
+        age = in.readInt();
+        dateOfBirth = in.readString();
+        homeLocation = in.readString();
+        deviceToken = in.readString();
+        profileImage = in.readString();
     }
 
 
@@ -111,15 +123,6 @@ public class Users implements Serializable {
         this.interests = interests;
     }
 
-
-    public List<Trips> getTripsList() {
-        return tripsList;
-    }
-
-    public void setTripsList(List<Trips> tripsHashMap) {
-        this.tripsList = tripsHashMap;
-    }
-
     public String getProfileImage() {
         return profileImage;
     }
@@ -164,4 +167,5 @@ public class Users implements Serializable {
     public int hashCode() {
         return Objects.hash(uid);
     }
+
 }

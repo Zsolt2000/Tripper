@@ -1,7 +1,10 @@
 package com.zsolt.licenta.ViewHolders;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +17,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+import com.zsolt.licenta.Activities.TripActivity;
+import com.zsolt.licenta.Activities.UserProfileActivity;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.R;
 import com.zsolt.licenta.Utils.AddFriendsDialogListener;
@@ -26,10 +31,18 @@ public class AddFriendsAdapter extends RecyclerView.Adapter<AddFriendsViewHolder
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
     private AddFriendsDialogListener listener;
+    private boolean isRemovable;
+    private Context context;
 
-    public AddFriendsAdapter(List<Users> friendsList, AddFriendsDialogListener listener) {
+    public AddFriendsAdapter(List<Users> friendsList, AddFriendsDialogListener listener, Context context) {
         this.friendsList = friendsList;
         this.listener = listener;
+        this.context = context;
+    }
+
+    public void setRemovable(boolean isRemovable) {
+        this.isRemovable = isRemovable;
+        notifyDataSetChanged();
     }
 
 
@@ -48,6 +61,17 @@ public class AddFriendsAdapter extends RecyclerView.Adapter<AddFriendsViewHolder
         Users user = friendsList.get(position);
         holder.getTextProfileName().setText(user.getName());
         storageReference.child("Images/" + user.getProfileImage()).getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).placeholder(R.drawable.profile_icon).into(holder.getImageProfile()));
+        if (isRemovable) {
+            holder.getButtonRemoveFriend().setVisibility(View.VISIBLE);
+        } else {
+            holder.getButtonRemoveFriend().setVisibility(View.GONE);
+            holder.itemView.setOnClickListener(v -> {
+                Intent userProfile = new Intent(context, UserProfileActivity.class);
+                userProfile.putExtra("selectedUser", user);
+                context.startActivity(userProfile);
+
+            });
+        }
         holder.getButtonRemoveFriend().setOnClickListener(v -> {
             friendsList.remove(holder.getAdapterPosition());
             notifyDataSetChanged();
@@ -59,13 +83,8 @@ public class AddFriendsAdapter extends RecyclerView.Adapter<AddFriendsViewHolder
         return friendsList.size();
     }
 
-    public Users getItem(int position) {
-        return friendsList.get(position);
-    }
-
     public List<Users> getFriendsList() {
         return friendsList;
     }
-
 
 }

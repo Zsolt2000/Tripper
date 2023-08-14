@@ -18,6 +18,7 @@ import com.zsolt.licenta.Activities.UserProfileActivity;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.R;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListViewHolder> {
@@ -30,7 +31,6 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListViewHolder
     public FriendListAdapter(Context context,List<Users> friendsList) {
         this.friendsList = friendsList;
         this.context=context;
-
     }
 
 
@@ -48,13 +48,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListViewHolder
         Users user = friendsList.get(position);
         holder.getTextFriendName().setText(user.getName());
         storageReference.child("Images/" + user.getProfileImage()).getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).placeholder(R.drawable.profile_icon).into(holder.getImageProfile()));
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent userProfile=new Intent(context, UserProfileActivity.class);
-                userProfile.putExtra("selectedUser",user);
-                context.startActivity(userProfile);
-            }
+        holder.itemView.setOnClickListener(v -> {
+            Intent userProfile=new Intent(context, UserProfileActivity.class);
+            userProfile.putExtra("selectedUser",(Serializable) user);
+            context.startActivity(userProfile);
         });
     }
 

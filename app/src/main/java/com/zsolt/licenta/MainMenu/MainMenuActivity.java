@@ -61,12 +61,16 @@ import com.squareup.picasso.Picasso;
 import com.zsolt.licenta.Activities.FriendsListActivity;
 import com.zsolt.licenta.Activities.PersonalProfileActivity;
 import com.zsolt.licenta.Activities.UserProfileActivity;
+import com.zsolt.licenta.Activities.YourTripsActivity;
 import com.zsolt.licenta.Login.LoginActivity;
+import com.zsolt.licenta.Models.Trips;
 import com.zsolt.licenta.R;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.Utils.TripperActivityLifecycleCallbacks;
 import com.zsolt.licenta.ViewHolders.SuggestionsAdapter;
+import com.zsolt.licenta.ViewHolders.TripListAdapter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,6 +91,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private List<Users> usersList;
     private SuggestionsAdapter suggestionsAdapter;
     private Users currentUser;
+    private List<Trips> tripsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,13 +100,26 @@ public class MainMenuActivity extends AppCompatActivity {
         setupViews();
         setupToolbar();
         setupFirebase();
-        setHeaderProfile();
+        setupTripsList();
         addTrips();
         navigationDrawerSelection();
         bottomNavigationSelection();
         getSupportFragmentManager().beginTransaction().add(R.id.frameLayoutMain, new HomeFragment()).commit();
 
     }
+
+    private void setupTripsList() {
+        tripsList = new ArrayList<>();
+        databaseReference.child("Trips").get().addOnSuccessListener(dataSnapshot -> {
+            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                Trips trip = ds.getValue(Trips.class);
+                if (trip.isPrivate() == false) {
+                    tripsList.add(trip);
+                }
+            }
+        });
+    }
+
 
     private void setHeaderProfile() {
         View headerView = navigationView.getHeaderView(0);
@@ -121,9 +139,9 @@ public class MainMenuActivity extends AppCompatActivity {
     private void saveUserToSharedPreference() {
         SharedPreferences sharedPreferences = getSharedPreferences("TripperPreference", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson=new Gson();
-        String currentUserToJson=gson.toJson(currentUser);
-        editor.putString("currentUser",currentUserToJson);
+        Gson gson = new Gson();
+        String currentUserToJson = gson.toJson(currentUser);
+        editor.putString("currentUser", currentUserToJson);
         editor.apply();
     }
 
@@ -148,25 +166,27 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private void bottomNavigationSelection() {
         bottomNav.setOnItemSelectedListener(item -> {
-            Fragment selectedFragment = null;
+            Fragment fragment=null;
             switch (item.getItemId()) {
                 case R.id.home_navigation:
-                    selectedFragment = new HomeFragment();
+                    fragment=new HomeFragment();
                     toolbar.setTitle("Home");
                     break;
                 case R.id.trips_navigation:
-                    selectedFragment = new TripsFragment();
+                    fragment = new TripsFragment();
                     toolbar.setTitle("Trips");
                     break;
                 case R.id.chat_navigation:
-                    selectedFragment = new ChatFragment();
+                    fragment = new ChatFragment();
                     toolbar.setTitle("Chats");
                     break;
             }
-            getSupportFragmentManager().beginTransaction().replace(R.id.frameLayoutMain, selectedFragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.frameLayoutMain, fragment).commit();
             return true;
         });
     }
+
+
 
     private void navigationDrawerSelection() {
         navigationView.setNavigationItemSelectedListener(item -> {
@@ -176,10 +196,11 @@ public class MainMenuActivity extends AppCompatActivity {
                     startActivity(profileActivity);
                     break;
                 case R.id.nav_trips:
-                    Toast.makeText(getApplicationContext(), "Your trips was pressed", Toast.LENGTH_SHORT).show();
+                    Intent yourTripsActivity=new Intent(MainMenuActivity.this, YourTripsActivity.class);
+                    startActivity(yourTripsActivity);
                     break;
                 case R.id.nav_friend_list:
-                    Intent friendsListActivity=new Intent(MainMenuActivity.this, FriendsListActivity.class);
+                    Intent friendsListActivity = new Intent(MainMenuActivity.this, FriendsListActivity.class);
                     startActivity(friendsListActivity);
                     break;
                 case R.id.nav_logout:
@@ -227,6 +248,7 @@ public class MainMenuActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        setHeaderProfile();
         getMenuInflater().inflate(R.menu.search_menu, menu);
         MenuItem menuItem = menu.findItem(R.id.menu_search).setOnActionExpandListener(onActionExpandListener);
         AutoCompleteTextView autoCompleteTextView = (AutoCompleteTextView) menuItem.getActionView();
@@ -238,7 +260,7 @@ public class MainMenuActivity extends AppCompatActivity {
         autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
             Users selectedUser = suggestionsAdapter.getItem(position);
             Intent intent = new Intent(MainMenuActivity.this, UserProfileActivity.class);
-            intent.putExtra("selectedUser", selectedUser);
+            intent.putExtra("selectedUser", (Serializable) selectedUser);
             startActivity(intent);
         });
 
