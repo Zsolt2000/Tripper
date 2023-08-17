@@ -32,6 +32,7 @@ public class TripsFragment extends Fragment {
     private List<Trips> tripsList;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
+    private String currentUserUid;
 
 
     @Override
@@ -39,6 +40,7 @@ public class TripsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_trips, container, false);
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
+        currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         setupRecyclerView(view);
         setupRecyclerViewData();
         return view;
@@ -61,22 +63,23 @@ public class TripsFragment extends Fragment {
     }
 
     private void setupRecyclerViewData() {
+        tripsList = new ArrayList<>();
         databaseReference.child("Trips").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                tripsList = new ArrayList<>();
+                tripsList.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    Trips trips = ds.getValue(Trips.class);
-                    List<Users> currentTripInvitedUsers = trips.getInvitedUsers();
-                    String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                    Users currentUser = null;
-                    for (Users user : currentTripInvitedUsers) {
-                        if (user.getUid().equals(currentUserUid)) {
-                            currentUser = user;
+                    Trips trip = ds.getValue(Trips.class);
+                    if (trip.getInvitedUsers() != null) {
+                        if (trip.getCreator().getUid().equals(currentUserUid))
+                            tripsList.add(trip);
+                        else {
+                            for (Users user : trip.getInvitedUsers()) {
+                                if (user.getUid().equals(currentUserUid)) {
+                                    tripsList.add(trip);
+                                }
+                            }
                         }
-                    }
-                    if (trips.getCreator().getUid().equals(currentUserUid) || currentTripInvitedUsers.contains(currentUser)) {
-                        tripsList.add(trips);
                     }
                 }
                 tripListAdapter.setDataAdapter(tripsList);

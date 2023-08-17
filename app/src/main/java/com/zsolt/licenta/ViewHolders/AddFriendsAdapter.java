@@ -26,7 +26,7 @@ import com.zsolt.licenta.Utils.AddFriendsDialogListener;
 import java.util.List;
 
 public class AddFriendsAdapter extends RecyclerView.Adapter<AddFriendsViewHolder> {
-    private final List<Users> friendsList;
+    private List<Users> friendsList;
     private View itemView;
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
@@ -80,11 +80,19 @@ public class AddFriendsAdapter extends RecyclerView.Adapter<AddFriendsViewHolder
 
     @Override
     public int getItemCount() {
-        return friendsList.size();
+        if (friendsList == null)
+            return 0;
+        else
+            return friendsList.size();
     }
 
     public List<Users> getFriendsList() {
         return friendsList;
+    }
+
+    public void setFriendList(List<Users>friendsList) {
+        this.friendsList=friendsList;
+        notifyDataSetChanged();;
     }
 
 }

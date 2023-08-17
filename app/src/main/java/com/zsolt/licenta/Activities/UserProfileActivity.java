@@ -78,6 +78,19 @@ public class UserProfileActivity extends AppCompatActivity {
         verifyIfFriend();
         setupProfile(selectedUser);
         setupSendNotifications();
+        setupStartChat();
+    }
+
+    private void setupStartChat() {
+        buttonStartChat.setOnClickListener(v -> {
+            if(isFriend){
+            Intent startChatActivity=new Intent(UserProfileActivity.this,MessagingActivity.class);
+            startChatActivity.putExtra("chat",selectedUser);
+            startActivity(startChatActivity);}
+            else {
+                Toast.makeText(this, "You must add this person as a friend to chat", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupSendNotifications() {

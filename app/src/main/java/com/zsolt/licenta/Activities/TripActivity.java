@@ -108,7 +108,7 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
         setupFirebase();
         getApiKey();
         setupSwitch();
-        getCurrentUser();
+        //getCurrentUser();
         setupAddPeopleDialog();
         setupAddLocation();
         setupStartDate();
@@ -135,38 +135,45 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
     private void setupJoinTrip() {
         buttonJoinTrip.setOnClickListener(v -> {
             HashMap<String, Object> userHashMap = new HashMap<>();
-            List<Users> usersList = currentTrip.getInvitedUsers();
+            List<Users> usersList;
+            if (currentTrip.getInvitedUsers() == null) {
+                usersList = new ArrayList<>();
+            } else {
+                usersList = currentTrip.getInvitedUsers();
+            }
             if (isUserJoined) {
                 buttonJoinTrip.setText("Join Trip");
                 isUserJoined = false;
                 usersList.remove(currentUser);
                 currentTrip.setInvitedUsers(usersList);
                 userHashMap.put(currentTripTitle, currentTrip);
-                databaseReference.child("Trips").updateChildren(userHashMap, (error, ref) -> addFriendsAdapter.notifyDataSetChanged());
+                databaseReference.child("Trips").updateChildren(userHashMap, (error, ref) -> addFriendsAdapter.setFriendList(usersList));
             } else {
                 buttonJoinTrip.setText("Leave Trip");
                 isUserJoined = true;
                 usersList.add(currentUser);
                 currentTrip.setInvitedUsers(usersList);
                 userHashMap.put(currentTripTitle, currentTrip);
-                databaseReference.child("Trips").updateChildren(userHashMap, (error, ref) -> addFriendsAdapter.notifyDataSetChanged());
+                databaseReference.child("Trips").updateChildren(userHashMap, (error, ref) -> addFriendsAdapter.setFriendList(usersList));
             }
         });
     }
 
     private void verifyIfUserIsJoined() {
-        if (currentTrip.getInvitedUsers().contains(currentUser)) {
-            buttonJoinTrip.setText("Leave Trip");
-            isUserJoined = true;
-        } else {
-            buttonJoinTrip.setText("Join trip");
-            isUserJoined = false;
+        if (currentTrip.getInvitedUsers() != null) {
+            if (currentTrip.getInvitedUsers().contains(currentUser)) {
+                buttonJoinTrip.setText("Leave Trip");
+                isUserJoined = true;
+            } else {
+                buttonJoinTrip.setText("Join trip");
+                isUserJoined = false;
+            }
         }
     }
 
     private void getCurrentUser() {
         databaseReference.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(dataSnapshot -> {
-            currentUser=dataSnapshot.getValue(Users.class);
+            currentUser = dataSnapshot.getValue(Users.class);
             verifyIfUserIsJoined();
         });
     }
@@ -269,15 +276,20 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
         currentTripTitle = getIntent().getStringExtra("trip");
         databaseReference.child("Trips").child(currentTripTitle).get().addOnSuccessListener(dataSnapshot -> {
             currentTrip = dataSnapshot.getValue(Trips.class);
-            editViewTripTitle.setText(currentTrip.getTitle());
+            editViewTripTitle.setText(currentTripTitle);
             editViewTripLocation.setText(currentTrip.getLocation());
             editViewTripNumberOfPeople.setText(String.valueOf(currentTrip.getNumberOfPeople()));
             editViewTripStartDate.setText(currentTrip.getStartDate());
             spinnerViewTripType.setSelection(currentTrip.getTripType().ordinal());
-            invitedPeople = new ArrayList<>(currentTrip.getInvitedUsers());
+            if (currentTrip.getInvitedUsers() == null) {
+                invitedPeople = new ArrayList<>();
+            } else {
+                invitedPeople = new ArrayList<>(currentTrip.getInvitedUsers());
+            }
+
             addFriendsAdapter = new AddFriendsAdapter(currentTrip.getInvitedUsers(), this, this);
             setupSpinner();
-
+            getCurrentUser();
             if (currentTrip.isPrivate()) {
                 switchViewTripVisibility.setChecked(true);
             } else {
@@ -396,6 +408,8 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         setupTripInformation();
+        //getCurrentUser();
+        //verifyIfUserIsJoined();
         getMenuInflater().inflate(R.menu.edit_profile_menu, menu);
         MenuItem menuItem = menu.findItem(R.id.edit_profile);
         menuItem.setActionView(R.layout.custom_settings_profile);
@@ -446,13 +460,13 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
             updatedTrip.put(currentTripTitle, currentTrip);
             databaseReference.child("Trips").updateChildren(updatedTrip, (error, ref) -> Toast.makeText(TripActivity.this, "Successfully saved the trip", Toast.LENGTH_SHORT).show());
             for (int i = 0; i < newInvitedUsers.size(); i++) {
-                sendNotification(newInvitedUsers.get(i).getDeviceToken(),currentTrip.getTitle());
+                sendNotification(newInvitedUsers.get(i).getDeviceToken(), currentTrip.getTitle());
             }
         }
     }
 
-    private void sendNotification(String userToken,String tripTitle) {
-        Data data = new Data(tripTitle,NotificationType.NEW_TRIP);
+    private void sendNotification(String userToken, String tripTitle) {
+        Data data = new Data(tripTitle, NotificationType.NEW_TRIP);
         NotificationSender notificationSender = new NotificationSender(data, userToken);
         tripperMessagingData.sendNotification(notificationSender).enqueue(new Callback<MyResponse>() {
             @Override

@@ -52,15 +52,24 @@ public class LoginActivity extends AppCompatActivity {
 
     private void setupLogin() {
         if (firebaseUser != null) {
-            databaseReference.child("Users").child(firebaseUser.getUid()).get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Intent mainActivity = new Intent(LoginActivity.this, MainMenuActivity.class);
-                    startActivity(mainActivity);
-                    finish();
-                } else {
-                    Toast.makeText(LoginActivity.this, "First set up your profile first", Toast.LENGTH_SHORT).show();
-                    Intent setupProfile = new Intent(LoginActivity.this, WelcomeUsersActivity.class);
-                    startActivity(setupProfile);
+            databaseReference.child("Users").child(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        Intent mainActivity = new Intent(LoginActivity.this, MainMenuActivity.class);
+                        startActivity(mainActivity);
+                        finish();
+                    } else {
+                        String ceva=firebaseUser.getUid();
+                        Toast.makeText(LoginActivity.this, "First set up your profile first", Toast.LENGTH_SHORT).show();
+                        Intent setupProfile = new Intent(LoginActivity.this, WelcomeUsersActivity.class);
+                        startActivity(setupProfile);
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
                 }
             });
         }

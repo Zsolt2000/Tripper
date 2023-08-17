@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.MessagingActivity">
+
+    <include
+        android:id="@+id/toolbar_chat"
+        layout="@layout/toolbar" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycleview_messages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/layout_send_message"
+        android:layout_below="@+id/toolbar_chat"
+        android:layout_marginTop="0dp"
+        android:paddingTop="8dp" />
+
+    <RelativeLayout
+        android:id="@+id/layout_send_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_style"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp">
+
+        <EditText
+            android:id="@+id/edit_send_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Send a message"
+            android:background="@drawable/edittext_style"
+            android:layout_toStartOf="@id/image_send_message"
+            android:padding="8dp"/>
+        <ImageButton
+            android:background="@drawable/button_style"
+            android:id="@+id/image_send_message"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/send_icon"/>
+    </RelativeLayout>
+
+
+
+</RelativeLayout>

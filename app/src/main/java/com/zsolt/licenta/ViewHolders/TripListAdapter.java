@@ -45,7 +45,14 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull TripListViewHolder holder, int position) {
         Trips trip = tripsList.get(position);
-        int availableSpots = trip.getNumberOfPeople() - trip.getInvitedUsers().size();
+        int availableSpots;
+        if(trip.getInvitedUsers()==null)
+        {
+            availableSpots=trip.getNumberOfPeople();
+        }
+        else {
+            availableSpots = trip.getNumberOfPeople() - trip.getInvitedUsers().size();
+        }
         holder.getTextTripTitle().setText(trip.getTitle());
         holder.getTextTripStartDate().setText("Start Date: " + trip.getStartDate());
         holder.getTextTripAvailability().setText("Available spots: " + availableSpots);

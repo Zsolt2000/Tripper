@@ -261,6 +261,7 @@ public class MainMenuActivity extends AppCompatActivity {
             Users selectedUser = suggestionsAdapter.getItem(position);
             Intent intent = new Intent(MainMenuActivity.this, UserProfileActivity.class);
             intent.putExtra("selectedUser", (Serializable) selectedUser);
+            autoCompleteTextView.setText("");
             startActivity(intent);
         });
 

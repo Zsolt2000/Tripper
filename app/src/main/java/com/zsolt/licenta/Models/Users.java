@@ -8,13 +8,15 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.zsolt.licenta.Utils.Item;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-public class Users implements Serializable{
+public class Users implements Serializable, Item {
 
 
     private String uid;
