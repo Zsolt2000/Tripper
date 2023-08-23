@@ -90,7 +90,6 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
         setLayoutReadOnly(layoutPersonalProfile, false);
         setupFirebase();
         setupToolbar();
-        //setupProfile();
         setupAddInterests();
         setupDateOfBirth();
         setupLocation();
@@ -104,12 +103,7 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
         currentUser.setPhoneNumber(editProfilePhone.getText().toString());
         HashMap<String, Object> updatedProfile = new HashMap<>();
         updatedProfile.put(currentUser.getUid(), currentUser);
-        databaseReference.child("Users").updateChildren(updatedProfile, new DatabaseReference.CompletionListener() {
-            @Override
-            public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
-                Toast.makeText(PersonalProfileActivity.this, "Succesfully updated profile", Toast.LENGTH_SHORT).show();
-            }
-        });
+        databaseReference.child("Users").updateChildren(updatedProfile, (error, ref) -> Toast.makeText(PersonalProfileActivity.this, "Succesfully updated profile", Toast.LENGTH_SHORT).show());
     }
 
 

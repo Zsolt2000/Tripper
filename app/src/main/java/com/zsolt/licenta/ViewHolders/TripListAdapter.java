@@ -61,13 +61,10 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListViewHolder> {
         } else {
             holder.getTextTripVisibility().setText("Public");
         }
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent tripActivity = new Intent(context, TripActivity.class);
-                tripActivity.putExtra("trip", trip.getTitle());
-                context.startActivity(tripActivity);
-            }
+        holder.itemView.setOnClickListener(v -> {
+            Intent tripActivity = new Intent(context, TripActivity.class);
+            tripActivity.putExtra("trip", trip.getTitle());
+            context.startActivity(tripActivity);
         });
     }
 

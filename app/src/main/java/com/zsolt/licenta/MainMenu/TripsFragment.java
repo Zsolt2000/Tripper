@@ -33,6 +33,7 @@ public class TripsFragment extends Fragment {
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private String currentUserUid;
+    private Users currentUser;
 
 
     @Override
@@ -64,16 +65,17 @@ public class TripsFragment extends Fragment {
 
     private void setupRecyclerViewData() {
         tripsList = new ArrayList<>();
+        currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         databaseReference.child("Trips").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 tripsList.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Trips trip = ds.getValue(Trips.class);
-                    if (trip.getInvitedUsers() != null) {
-                        if (trip.getCreator().getUid().equals(currentUserUid))
-                            tripsList.add(trip);
-                        else {
+                    if (trip.getCreator().getUid().equals(currentUserUid)) {
+                        tripsList.add(trip);
+                    } else {
+                        if (trip.getInvitedUsers() != null) {
                             for (Users user : trip.getInvitedUsers()) {
                                 if (user.getUid().equals(currentUserUid)) {
                                     tripsList.add(trip);

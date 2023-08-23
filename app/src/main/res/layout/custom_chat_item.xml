@@ -9,7 +9,7 @@
         android:id="@+id/image_chat_item"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/trips_icon" />
+        android:src="@drawable/profile_icon" />
 
     <LinearLayout
         android:layout_width="wrap_content"

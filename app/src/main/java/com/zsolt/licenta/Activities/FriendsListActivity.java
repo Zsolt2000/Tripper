@@ -64,12 +64,13 @@ public class FriendsListActivity extends AppCompatActivity {
         databaseReference.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child("friendsList").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                friendsList.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Users users = ds.getValue(Users.class);
                     friendsList.add(users);
-                    friendListAdapter.notifyDataSetChanged();
-                }
 
+                }
+                friendListAdapter.notifyDataSetChanged();
             }
 
 

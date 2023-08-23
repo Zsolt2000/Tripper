@@ -51,8 +51,10 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -126,9 +128,10 @@ public class MainMenuActivity extends AppCompatActivity {
         ImageView headerProfileImage = headerView.findViewById(R.id.header_profile_image);
         TextView headerTextView = headerView.findViewById(R.id.header_profile_name);
         String uid = firebaseUser.getUid();
-        databaseReference.child("Users").child(uid).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                currentUser = task.getResult().getValue(Users.class);
+        databaseReference.child("Users").child(uid).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                currentUser = dataSnapshot.getValue(Users.class);
                 storageReference.child("Images/" + currentUser.getProfileImage()).getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).placeholder(R.drawable.profile_icon).into(headerProfileImage));
                 headerTextView.setText(currentUser.getName());
                 saveUserToSharedPreference();
@@ -294,9 +297,5 @@ public class MainMenuActivity extends AppCompatActivity {
         }
     };
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        setHeaderProfile();
-    }
+
 }

@@ -30,6 +30,7 @@ import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.R;
 
 import java.io.Serializable;
+import java.util.Random;
 
 
 public class TripperMessagingService extends FirebaseMessagingService {
@@ -37,6 +38,7 @@ public class TripperMessagingService extends FirebaseMessagingService {
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private NotificationType notificationType;
+    private int notificationId;
 
     @Override
     public void onNewToken(@NonNull String token) {
@@ -53,6 +55,8 @@ public class TripperMessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+        Random random=new Random();
+        notificationId=random.nextInt(9999-1000);
         notificationType = NotificationType.valueOf(remoteMessage.getData().get("notificationType"));
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         String destination = remoteMessage.getData().get("destination");
@@ -96,7 +100,7 @@ public class TripperMessagingService extends FirebaseMessagingService {
     private void createMessageNotification(Users user) {
         Intent intent = new Intent(getApplicationContext(), MessagingActivity.class);
         intent.putExtra("chat", user);
-        String channel_id = "notification_channel";
+        String channel_id = "message_channel";
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent
                 = PendingIntent.getActivity(
@@ -121,19 +125,19 @@ public class TripperMessagingService extends FirebaseMessagingService {
                 >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel
                     = new NotificationChannel(
-                    channel_id, "web_app",
+                    channel_id, channel_id,
                     NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(
                     notificationChannel);
         }
 
-        notificationManager.notify(0, builder.build());
+        notificationManager.notify(notificationId, builder.build());
     }
 
     private void createNotification(Users user) {
         Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
         intent.putExtra("selectedUser", user);
-        String channel_id = "notification_channel";
+        String channel_id = "friend_channel";
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent
                 = PendingIntent.getActivity(
@@ -158,19 +162,19 @@ public class TripperMessagingService extends FirebaseMessagingService {
                 >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel
                     = new NotificationChannel(
-                    channel_id, "web_app",
+                    channel_id, channel_id,
                     NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(
                     notificationChannel);
         }
 
-        notificationManager.notify(0, builder.build());
+        notificationManager.notify(notificationId, builder.build());
     }
 
     private void createNotification(String tripCreator, String tripTitle) {
         Intent intent = new Intent(getApplicationContext(), TripActivity.class);
         intent.putExtra("trip", tripTitle);
-        String channel_id = "notification_channel";
+        String channel_id = "trip_channel";
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent
                 = PendingIntent.getActivity(
@@ -195,13 +199,13 @@ public class TripperMessagingService extends FirebaseMessagingService {
                 >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel
                     = new NotificationChannel(
-                    channel_id, "web_app",
+                    channel_id, channel_id,
                     NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(
                     notificationChannel);
         }
 
-        notificationManager.notify(0, builder.build());
+        notificationManager.notify(notificationId, builder.build());
     }
 
 

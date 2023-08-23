@@ -5,13 +5,10 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
-import com.zsolt.licenta.Utils.Item;
-
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
-public class Trips implements Serializable,Parcelable, Item {
+public class Trips implements Serializable,Parcelable{
     private String title;
     private Users creator;
     private String startDate;

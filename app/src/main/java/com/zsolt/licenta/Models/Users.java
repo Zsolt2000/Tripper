@@ -1,22 +1,15 @@
 package com.zsolt.licenta.Models;
 
-import android.media.Image;
-import android.net.Uri;
 import android.os.Parcel;
-import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.zsolt.licenta.Utils.Item;
-
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-public class Users implements Serializable, Item {
+public class Users implements Serializable{
 
 
     private String uid;
@@ -32,6 +25,11 @@ public class Users implements Serializable, Item {
     private String profileImage;
     public Users() {
     }
+    public Users(String uid)
+    {
+        this.uid=uid;
+    }
+
 
     public Users(String uid, String name, String phoneNumber, int age, String dateOfBirth, String homeLocation, List<Interests> interests, String profileImage, Gender gender,HashMap<String,Users>friendsList,String deviceToken) {
         this.uid = uid;

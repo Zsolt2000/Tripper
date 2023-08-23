@@ -60,8 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                         startActivity(mainActivity);
                         finish();
                     } else {
-                        String ceva=firebaseUser.getUid();
-                        Toast.makeText(LoginActivity.this, "First set up your profile first", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Set up your profile first", Toast.LENGTH_SHORT).show();
                         Intent setupProfile = new Intent(LoginActivity.this, WelcomeUsersActivity.class);
                         startActivity(setupProfile);
                     }

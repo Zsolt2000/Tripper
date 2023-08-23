@@ -38,6 +38,7 @@ public class HomeFragment extends Fragment {
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
     private String currentUserUid;
+    private Users currentUser;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,10 +79,15 @@ public class HomeFragment extends Fragment {
                         if (!trip.getCreator().getUid().equals(currentUserUid)) {
                             if (trip.getInvitedUsers() != null) {
                                 for (Users user : trip.getInvitedUsers()) {
-                                    if (!user.getUid().equals(currentUserUid)) {
-                                        tripsList.add(trip);
+                                    if (user.getUid().equals(currentUserUid)) {
+                                        currentUser = user;
                                     }
                                 }
+                                if (currentUser != null) {
+                                    if (!trip.getInvitedUsers().contains(currentUser)) {
+                                        tripsList.add(trip);
+                                    }
+                                }else{tripsList.add(trip);}
                             } else {
                                 tripsList.add(trip);
                             }

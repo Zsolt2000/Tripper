@@ -19,13 +19,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.zsolt.licenta.Models.Chat;
 import com.zsolt.licenta.Models.ChatList;
-import com.zsolt.licenta.Models.ChatType;
-import com.zsolt.licenta.Models.Trips;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.R;
-import com.zsolt.licenta.Utils.Item;
 import com.zsolt.licenta.ViewHolders.ChatListAdapter;
 
 import java.util.ArrayList;
@@ -38,8 +34,7 @@ public class ChatFragment extends Fragment {
     private DatabaseReference databaseReference;
     private FirebaseUser firebaseUser;
     private String userUid;
-    private List<String> userUidList, groupUidList;
-    private List<Item> itemsList;
+    List<Users> usersList;
     private List<ChatList> chatList;
 
     @Override
@@ -76,9 +71,8 @@ public class ChatFragment extends Fragment {
     }
 
     private void readChats() {
-        itemsList = new ArrayList<>();
-        List<Item> usersChatList = new ArrayList<>();
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        usersList = new ArrayList<>();
+        /*databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 itemsList.clear();
@@ -110,18 +104,28 @@ public class ChatFragment extends Fragment {
                             itemsList.add(trip);
                         }
                     }
+                }*/
+        databaseReference.child("Users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                usersList.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Users user = ds.getValue(Users.class);
+                    for (ChatList chatList1 : chatList) {
+                        if (user.getUid().equals(chatList1.getId())) {
+                            usersList.add(user);
+                        }
+                    }
                 }
-                itemsList.addAll(usersChatList);
-                chatListAdapter = new ChatListAdapter(itemsList, getContext());
+                chatListAdapter = new ChatListAdapter(usersList, getContext());
                 recyclerviewChats.setAdapter(chatListAdapter);
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
     }
+
 
     private void setupRecyclerView(View view) {
         recyclerviewChats = view.findViewById(R.id.recyclerview_chat_fragment);

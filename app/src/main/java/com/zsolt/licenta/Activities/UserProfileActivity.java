@@ -219,14 +219,14 @@ public class UserProfileActivity extends AppCompatActivity {
         flowLayout = findViewById(R.id.flowlayout_user_profile_interests);
     }
 
-    @Override
+   /* @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setupProfile((Users) intent.getSerializableExtra("selectedUser"));
 
 
     }
-
+*/
     private void setupToolbar() {
         setSupportActionBar(toolbar);
         actionbar = getSupportActionBar();
