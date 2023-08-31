@@ -8,27 +8,16 @@ public class Chat {
     private String sender;
     private String receiver;
     private String message;
-    private ChatType chatType;
-    private List<String>receiverList;
-
-
 
     private String date;
 
-    public Chat(String sender, String receiver, String message,String date,ChatType chatType) {
+    public Chat(String sender, String receiver, String message,String date) {
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;
         this.date=date;
-        this.chatType=chatType;
     }
-    public Chat(String sender,List<String> receiverList,String message,String date,ChatType chatType){
-        this.sender = sender;
-        this.receiverList = receiverList;
-        this.message = message;
-        this.date=date;
-        this.chatType=chatType;
-    }
+
     public Chat(){}
 
 
@@ -64,21 +53,8 @@ public class Chat {
         this.date = date;
     }
 
-    public ChatType getChatType() {
-        return chatType;
-    }
 
-    public void setChatType(ChatType chatType) {
-        this.chatType = chatType;
-    }
 
-    public List<String> getReceiverList() {
-        return receiverList;
-    }
-
-    public void setReceiverList(List<String> receiverList) {
-        this.receiverList = receiverList;
-    }
 
     @Override
     public String toString() {
@@ -86,8 +62,6 @@ public class Chat {
                 "sender='" + sender + '\'' +
                 ", receiver='" + receiver + '\'' +
                 ", message='" + message + '\'' +
-                ", chatType=" + chatType +
-                ", receiverList=" + receiverList +
                 ", date='" + date + '\'' +
                 '}';
     }

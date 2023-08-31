@@ -1,16 +1,12 @@
 package com.zsolt.licenta.Notifications;
 
-import com.zsolt.licenta.Models.NotificationType;
-import com.zsolt.licenta.Models.Users;
-
-import java.util.List;
-
 public class Data {
-    private String destination;
+    private String messageData;
     private NotificationType notificationType;
 
-    public Data(String destination,NotificationType notificationType) {
-        this.destination=destination;
+    public Data(String messageData, NotificationType notificationType) {
+        this.messageData=messageData;
         this.notificationType=notificationType;
     }
 }
+

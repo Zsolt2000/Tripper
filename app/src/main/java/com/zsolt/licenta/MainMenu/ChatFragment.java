@@ -72,39 +72,6 @@ public class ChatFragment extends Fragment {
 
     private void readChats() {
         usersList = new ArrayList<>();
-        /*databaseReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                itemsList.clear();
-                usersChatList.clear();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    if (ds.getKey().equals("Users")) {
-                        for (DataSnapshot ds2 : ds.getChildren()) {
-                            Users user = ds2.getValue(Users.class);
-                            for (ChatList chat1 : chatList) {
-                                if (user.getUid().equals(chat1.getId())) {
-                                    if (usersChatList.size() != 0) {
-                                        for (Item item : usersChatList) {
-                                            if (item instanceof Users) {
-                                                Users user1 = (Users) item;
-                                                if (!user.getUid().equals(user1.getUid())) {
-                                                    usersChatList.add(user);
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        usersChatList.add(user);
-                                    }
-                                }
-                            }
-                        }
-                    } else if (ds.getKey().equals("Trips")) {
-                        for (DataSnapshot ds2 : ds.getChildren()) {
-                            Trips trip = ds2.getValue(Trips.class);
-                            itemsList.add(trip);
-                        }
-                    }
-                }*/
         databaseReference.child("Users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

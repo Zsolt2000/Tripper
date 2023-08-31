@@ -5,10 +5,8 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.SupportMenuInflater;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -18,8 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -39,7 +35,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,21 +44,19 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.zsolt.licenta.CustomViews.AddFriendDialogFragment;
-import com.zsolt.licenta.MainMenu.AddTripActivity;
-import com.zsolt.licenta.Models.NotificationType;
 import com.zsolt.licenta.Models.TripType;
 import com.zsolt.licenta.Models.Trips;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.Notifications.Data;
 import com.zsolt.licenta.Notifications.MyResponse;
 import com.zsolt.licenta.Notifications.NotificationSender;
+import com.zsolt.licenta.Notifications.NotificationType;
 import com.zsolt.licenta.Notifications.RetrofitClient;
 import com.zsolt.licenta.Notifications.TripperMessagingData;
 import com.zsolt.licenta.R;
 import com.zsolt.licenta.Utils.AddFriendsDialogListener;
 import com.zsolt.licenta.ViewHolders.AddFriendsAdapter;
 
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,6 +107,7 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
         setupStartDate();
         setupJoinTrip();
         setupDeleteTrip();
+        tripperMessagingData = RetrofitClient.getClient("https://fcm.googleapis.com/").create(TripperMessagingData.class);
     }
 
     private void setupDeleteTrip() {
@@ -154,6 +148,7 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
                 usersList.add(currentUser);
                 currentTrip.setInvitedUsers(usersList);
                 userHashMap.put(currentTripTitle, currentTrip);
+                sendNotification(currentTrip.getCreator().getDeviceToken(),currentTrip.getTitle(),NotificationType.JOIN_TRIP);
                 databaseReference.child("Trips").updateChildren(userHashMap, (error, ref) -> addFriendsAdapter.setFriendList(usersList));
             }
         });
@@ -465,7 +460,6 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
 
     private void updateTrip() {
         if (validTrip()) {
-            tripperMessagingData = RetrofitClient.getClient("https://fcm.googleapis.com/").create(TripperMessagingData.class);
             List<Users> newInvitedUsers = new ArrayList<>();
             if (addFriendsAdapter.getFriendsList() != null) {
                 newInvitedUsers = new ArrayList<>(addFriendsAdapter.getFriendsList());
@@ -481,7 +475,7 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
             updatedTrip.put(currentTrip.getTitle(), currentTrip);
             databaseReference.child("Trips").updateChildren(updatedTrip, (error, ref) -> Toast.makeText(TripActivity.this, "Successfully saved the trip", Toast.LENGTH_SHORT).show());
             for (int i = 0; i < newInvitedUsers.size(); i++) {
-                sendNotification(newInvitedUsers.get(i).getDeviceToken(), currentTrip.getTitle());
+                sendNotification(newInvitedUsers.get(i).getDeviceToken(), currentTrip.getTitle(),NotificationType.NEW_TRIP);
             }
             if (!currentTrip.getTitle().equals(currentTripTitle))
                 databaseReference.child("Trips").child(currentTripTitle).removeValue();
@@ -489,8 +483,8 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
         }
     }
 
-    private void sendNotification(String userToken, String tripTitle) {
-        Data data = new Data(tripTitle, NotificationType.NEW_TRIP);
+    private void sendNotification(String userToken, String tripTitle,NotificationType notificationType) {
+        Data data = new Data(tripTitle, notificationType);
         NotificationSender notificationSender = new NotificationSender(data, userToken);
         tripperMessagingData.sendNotification(notificationSender).enqueue(new Callback<MyResponse>() {
             @Override

@@ -75,21 +75,31 @@ public class HomeFragment extends Fragment {
                 tripsList.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     Trips trip = ds.getValue(Trips.class);
-                    if (!trip.isPrivate()) {
-                        if (!trip.getCreator().getUid().equals(currentUserUid)) {
-                            if (trip.getInvitedUsers() != null) {
-                                for (Users user : trip.getInvitedUsers()) {
-                                    if (user.getUid().equals(currentUserUid)) {
-                                        currentUser = user;
+                    int availableSpots;
+                    if (trip.getInvitedUsers() == null) {
+                        availableSpots = trip.getNumberOfPeople();
+                    } else {
+                        availableSpots = trip.getNumberOfPeople() - trip.getInvitedUsers().size();
+                    }
+                    if (availableSpots != 0) {
+                        if (!trip.isPrivate()) {
+                            if (!trip.getCreator().getUid().equals(currentUserUid)) {
+                                if (trip.getInvitedUsers() != null) {
+                                    for (Users user : trip.getInvitedUsers()) {
+                                        if (user.getUid().equals(currentUserUid)) {
+                                            currentUser = user;
+                                        }
                                     }
-                                }
-                                if (currentUser != null) {
-                                    if (!trip.getInvitedUsers().contains(currentUser)) {
+                                    if (currentUser != null) {
+                                        if (!trip.getInvitedUsers().contains(currentUser)) {
+                                            tripsList.add(trip);
+                                        }
+                                    } else {
                                         tripsList.add(trip);
                                     }
-                                }else{tripsList.add(trip);}
-                            } else {
-                                tripsList.add(trip);
+                                } else {
+                                    tripsList.add(trip);
+                                }
                             }
                         }
                     }

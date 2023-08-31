@@ -6,8 +6,7 @@ import com.zsolt.licenta.Models.Users;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class UsersMockTest {
-
+public class UsersUnitTest {
     private Users user;
 
     @Test

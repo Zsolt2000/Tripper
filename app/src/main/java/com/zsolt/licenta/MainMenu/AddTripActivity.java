@@ -5,7 +5,6 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -40,18 +39,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.zsolt.licenta.Activities.MapActivity;
-import com.zsolt.licenta.Models.NotificationType;
 import com.zsolt.licenta.Models.Trips;
 import com.zsolt.licenta.Notifications.Data;
 import com.zsolt.licenta.Notifications.MyResponse;
 import com.zsolt.licenta.Notifications.NotificationSender;
+import com.zsolt.licenta.Notifications.NotificationType;
 import com.zsolt.licenta.Notifications.RetrofitClient;
 import com.zsolt.licenta.Notifications.TripperMessagingData;
 import com.zsolt.licenta.Utils.AddFriendsDialogListener;
@@ -65,7 +64,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -93,6 +91,7 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
     private List<Users> friendList;
     private TripperMessagingData tripperMessagingData;
     private TripType tripType;
+    private Users currentUser;
 
 
     @Override
@@ -111,6 +110,7 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
         setupRecyclerView();
         getApiKey();
         setupAddTrip();
+        getCurrentUser();
     }
 
     private void setupAddTrip() {
@@ -120,12 +120,10 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
                 String tripTitle = editTripTitle.getText().toString();
                 String tripLocation = editAddLocation.getText().toString();
                 String tripStartDate = editStartDate.getText().toString();
-
-                Users tripCreator = getCurrentUser();
                 boolean isPrivate = switchTripVisibility.isChecked();
                 int numberOfPeople = Integer.parseInt(editNumberOfPeople.getText().toString());
                 List<Users> invitedPeople = addFriendsAdapter.getFriendsList();
-                Trips trip = new Trips(tripTitle, tripCreator, tripStartDate, numberOfPeople, isPrivate, tripLocation, invitedPeople, tripType);
+                Trips trip = new Trips(tripTitle, currentUser, tripStartDate, numberOfPeople, isPrivate, tripLocation, invitedPeople, tripType);
                 saveTrip(trip);
             }
         });
@@ -178,11 +176,13 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
     }
 
 
-    private Users getCurrentUser() {
-        SharedPreferences sharedPreferences = getSharedPreferences("TripperPreference", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String defaultValue = "";
-        return gson.fromJson(sharedPreferences.getString("currentUser", defaultValue), Users.class);
+    private void getCurrentUser() {
+        databaseReference.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+           currentUser=dataSnapshot.getValue(Users.class);
+            }
+        });
     }
 
 

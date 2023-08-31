@@ -46,26 +46,26 @@ public class TripListAdapter extends RecyclerView.Adapter<TripListViewHolder> {
     public void onBindViewHolder(@NonNull TripListViewHolder holder, int position) {
         Trips trip = tripsList.get(position);
         int availableSpots;
-        if(trip.getInvitedUsers()==null)
-        {
-            availableSpots=trip.getNumberOfPeople();
-        }
-        else {
+        if (trip.getInvitedUsers() == null) {
+            availableSpots = trip.getNumberOfPeople();
+        } else {
             availableSpots = trip.getNumberOfPeople() - trip.getInvitedUsers().size();
         }
-        holder.getTextTripTitle().setText(trip.getTitle());
-        holder.getTextTripStartDate().setText("Start Date: " + trip.getStartDate());
-        holder.getTextTripAvailability().setText("Available spots: " + availableSpots);
-        if (trip.isPrivate() == true) {
-            holder.getTextTripVisibility().setText("Private");
-        } else {
-            holder.getTextTripVisibility().setText("Public");
-        }
-        holder.itemView.setOnClickListener(v -> {
-            Intent tripActivity = new Intent(context, TripActivity.class);
-            tripActivity.putExtra("trip", trip.getTitle());
-            context.startActivity(tripActivity);
-        });
+
+            holder.getTextTripTitle().setText(trip.getTitle());
+            holder.getTextTripStartDate().setText("Start Date: " + trip.getStartDate());
+            holder.getTextTripAvailability().setText("Available spots: " + availableSpots);
+            if (trip.isPrivate() == true) {
+                holder.getTextTripVisibility().setText("Private");
+            } else {
+                holder.getTextTripVisibility().setText("Public");
+            }
+            holder.itemView.setOnClickListener(v -> {
+                Intent tripActivity = new Intent(context, TripActivity.class);
+                tripActivity.putExtra("trip", trip.getTitle());
+                context.startActivity(tripActivity);
+            });
+
     }
 
     @Override

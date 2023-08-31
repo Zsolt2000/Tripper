@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-public class TripsMockTest {
+public class TripsUnitTest {
     private Trips trip;
 
     @Test

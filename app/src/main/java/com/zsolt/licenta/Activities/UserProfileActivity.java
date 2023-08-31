@@ -3,11 +3,7 @@ package com.zsolt.licenta.Activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -18,8 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -32,9 +26,9 @@ import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.nex3z.flowlayout.FlowLayout;
 import com.squareup.picasso.Picasso;
-import com.zsolt.licenta.Models.NotificationType;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.Notifications.Data;
+import com.zsolt.licenta.Notifications.NotificationType;
 import com.zsolt.licenta.Notifications.RetrofitClient;
 import com.zsolt.licenta.Notifications.MyResponse;
 import com.zsolt.licenta.Notifications.NotificationSender;
@@ -61,9 +55,9 @@ public class UserProfileActivity extends AppCompatActivity {
     private FirebaseStorage firebaseStorage;
     private DatabaseReference databaseReference;
     private StorageReference storageReference;
-    private Users selectedUser;
+    private Users selectedUser, currentUser;
     private TripperMessagingData tripperMessagingData;
-    private boolean isFriend =false;
+    private boolean isFriend = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,15 +73,16 @@ public class UserProfileActivity extends AppCompatActivity {
         setupProfile(selectedUser);
         setupSendNotifications();
         setupStartChat();
+        getCurrentUser();
     }
 
     private void setupStartChat() {
         buttonStartChat.setOnClickListener(v -> {
-            if(isFriend){
-            Intent startChatActivity=new Intent(UserProfileActivity.this,MessagingActivity.class);
-            startChatActivity.putExtra("chat",selectedUser);
-            startActivity(startChatActivity);}
-            else {
+            if (isFriend) {
+                Intent startChatActivity = new Intent(UserProfileActivity.this, MessagingActivity.class);
+                startChatActivity.putExtra("chat", selectedUser);
+                startActivity(startChatActivity);
+            } else {
                 Toast.makeText(this, "You must add this person as a friend to chat", Toast.LENGTH_SHORT).show();
             }
         });
@@ -102,13 +97,13 @@ public class UserProfileActivity extends AppCompatActivity {
                 updateFriendList(false);
             } else {
                 String userDeviceToken = selectedUser.getDeviceToken();
-                String userUid=getCurrentUser().getUid();
-                sendNotifications(userDeviceToken,userUid);
+                String userUid = currentUser.getUid();
+                sendNotifications(userDeviceToken, userUid);
                 updateFriendList(true);
                 buttonAddFriend.setText("Remove friend");
                 buttonStartChat.setVisibility(View.VISIBLE);
             }
-            isFriend =!isFriend;
+            isFriend = !isFriend;
         });
     }
 
@@ -134,7 +129,7 @@ public class UserProfileActivity extends AppCompatActivity {
         String currentUserNode = "/" + FirebaseAuth.getInstance().getCurrentUser().getUid() + "/friendsList/" + selectedUser.getUid();
         Map<String, Object> usersMap = new HashMap<>();
         if (friendState) {
-            usersMap.put(selectedUserNode, getCurrentUser());
+            usersMap.put(selectedUserNode, currentUser);
             usersMap.put(currentUserNode, selectedUser);
             databaseReference.child("Users").updateChildren(usersMap).addOnSuccessListener(unused -> {
             });
@@ -146,15 +141,18 @@ public class UserProfileActivity extends AppCompatActivity {
         }
     }
 
-    private Users getCurrentUser() {
-        SharedPreferences sharedPreferences = getSharedPreferences("TripperPreference", Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String defaultValue = "";
-        return gson.fromJson(sharedPreferences.getString("currentUser", defaultValue), Users.class);
+    private void getCurrentUser() {
+        String currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        databaseReference.child("Users").child(currentUserUid).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                currentUser = dataSnapshot.getValue(Users.class);
+            }
+        });
     }
 
 
-    private void sendNotifications(String userToken,String userUID) {
+    private void sendNotifications(String userToken, String userUID) {
         Data data = new Data(userUID, NotificationType.FRIEND_REQUEST);
         NotificationSender sender = new NotificationSender(data, userToken);
         tripperMessagingData.sendNotification(sender).enqueue(new Callback<MyResponse>() {
@@ -219,14 +217,6 @@ public class UserProfileActivity extends AppCompatActivity {
         flowLayout = findViewById(R.id.flowlayout_user_profile_interests);
     }
 
-   /* @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setupProfile((Users) intent.getSerializableExtra("selectedUser"));
-
-
-    }
-*/
     private void setupToolbar() {
         setSupportActionBar(toolbar);
         actionbar = getSupportActionBar();

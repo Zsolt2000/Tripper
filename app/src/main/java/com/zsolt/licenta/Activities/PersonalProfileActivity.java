@@ -66,7 +66,6 @@ import java.util.Locale;
 public class PersonalProfileActivity extends AppCompatActivity implements AddInterestsDialogListener {
     private ActionBar actionbar;
     private Toolbar toolbar;
-    private Button buttonUpdateProfile;
     private ConstraintLayout layoutPersonalProfile;
     private ImageView imagePersonalProfile;
     private EditText editProfileName, editProfileAge, editProfilePhone, editProfileDate, editProfilePlace;
@@ -80,6 +79,7 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
     private FirebaseUser firebaseUser;
     private Users currentUser;
     private PlacesClient placesClient;
+    private Uri imageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +103,11 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
         currentUser.setPhoneNumber(editProfilePhone.getText().toString());
         HashMap<String, Object> updatedProfile = new HashMap<>();
         updatedProfile.put(currentUser.getUid(), currentUser);
-        databaseReference.child("Users").updateChildren(updatedProfile, (error, ref) -> Toast.makeText(PersonalProfileActivity.this, "Succesfully updated profile", Toast.LENGTH_SHORT).show());
+        if (imageUri != null) {
+            storageReference.child("Images/" + currentUser.getProfileImage()).putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
+            });
+        }
+        databaseReference.child("Users").updateChildren(updatedProfile, (error, ref) -> Toast.makeText(PersonalProfileActivity.this, "Successfully updated profile", Toast.LENGTH_SHORT).show());
     }
 
 
@@ -168,9 +172,10 @@ public class PersonalProfileActivity extends AppCompatActivity implements AddInt
     private final ActivityResultLauncher<String> openGallery = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
         @Override
         public void onActivityResult(Uri result) {
-            Picasso.get().load(result).into(imagePersonalProfile);
-            storageReference.child("Images/" + currentUser.getProfileImage()).putFile(result).addOnSuccessListener(taskSnapshot -> {
-            });
+            if (result != null) {
+                Picasso.get().load(result).into(imagePersonalProfile);
+                imageUri = result;
+            }
         }
     });
 

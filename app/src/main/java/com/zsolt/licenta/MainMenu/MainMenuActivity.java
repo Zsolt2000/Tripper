@@ -1,60 +1,34 @@
 package com.zsolt.licenta.MainMenu;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
-import android.Manifest;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -68,9 +42,7 @@ import com.zsolt.licenta.Login.LoginActivity;
 import com.zsolt.licenta.Models.Trips;
 import com.zsolt.licenta.R;
 import com.zsolt.licenta.Models.Users;
-import com.zsolt.licenta.Utils.TripperActivityLifecycleCallbacks;
 import com.zsolt.licenta.ViewHolders.SuggestionsAdapter;
-import com.zsolt.licenta.ViewHolders.TripListAdapter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -134,18 +106,16 @@ public class MainMenuActivity extends AppCompatActivity {
                 currentUser = dataSnapshot.getValue(Users.class);
                 storageReference.child("Images/" + currentUser.getProfileImage()).getDownloadUrl().addOnSuccessListener(uri -> Picasso.get().load(uri).placeholder(R.drawable.profile_icon).into(headerProfileImage));
                 headerTextView.setText(currentUser.getName());
-                saveUserToSharedPreference();
+                FirebaseMessaging.getInstance().getToken().addOnSuccessListener(new OnSuccessListener<String>() {
+                    @Override
+                    public void onSuccess(String s) {
+                        if (!currentUser.getDeviceToken().equals(s)) {
+                            databaseReference.child("Users").child(currentUser.getUid()).child("deviceToken").setValue(s);
+                        }
+                    }
+                });
             }
         });
-    }
-
-    private void saveUserToSharedPreference() {
-        SharedPreferences sharedPreferences = getSharedPreferences("TripperPreference", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson = new Gson();
-        String currentUserToJson = gson.toJson(currentUser);
-        editor.putString("currentUser", currentUserToJson);
-        editor.apply();
     }
 
 
@@ -169,10 +139,10 @@ public class MainMenuActivity extends AppCompatActivity {
 
     private void bottomNavigationSelection() {
         bottomNav.setOnItemSelectedListener(item -> {
-            Fragment fragment=null;
+            Fragment fragment = null;
             switch (item.getItemId()) {
                 case R.id.home_navigation:
-                    fragment=new HomeFragment();
+                    fragment = new HomeFragment();
                     toolbar.setTitle("Home");
                     break;
                 case R.id.trips_navigation:
@@ -190,7 +160,6 @@ public class MainMenuActivity extends AppCompatActivity {
     }
 
 
-
     private void navigationDrawerSelection() {
         navigationView.setNavigationItemSelectedListener(item -> {
             switch (item.getItemId()) {
@@ -199,7 +168,7 @@ public class MainMenuActivity extends AppCompatActivity {
                     startActivity(profileActivity);
                     break;
                 case R.id.nav_trips:
-                    Intent yourTripsActivity=new Intent(MainMenuActivity.this, YourTripsActivity.class);
+                    Intent yourTripsActivity = new Intent(MainMenuActivity.this, YourTripsActivity.class);
                     startActivity(yourTripsActivity);
                     break;
                 case R.id.nav_friend_list:
@@ -208,6 +177,7 @@ public class MainMenuActivity extends AppCompatActivity {
                     break;
                 case R.id.nav_logout:
                     FirebaseAuth.getInstance().signOut();
+
                     Intent loginActivity = new Intent(MainMenuActivity.this, LoginActivity.class);
                     startActivity(loginActivity);
             }

@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -52,23 +53,15 @@ public class LoginActivity extends AppCompatActivity {
 
     private void setupLogin() {
         if (firebaseUser != null) {
-            databaseReference.child("Users").child(firebaseUser.getUid()).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        Intent mainActivity = new Intent(LoginActivity.this, MainMenuActivity.class);
-                        startActivity(mainActivity);
-                        finish();
-                    } else {
-                        Toast.makeText(LoginActivity.this, "Set up your profile first", Toast.LENGTH_SHORT).show();
-                        Intent setupProfile = new Intent(LoginActivity.this, WelcomeUsersActivity.class);
-                        startActivity(setupProfile);
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
+            databaseReference.child("Users").child(firebaseUser.getUid()).get().addOnSuccessListener(dataSnapshot -> {
+                if (dataSnapshot.exists()) {
+                    Intent mainActivity = new Intent(LoginActivity.this, MainMenuActivity.class);
+                    startActivity(mainActivity);
+                    finish();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Set up your profile first", Toast.LENGTH_SHORT).show();
+                    Intent setupProfile = new Intent(LoginActivity.this, WelcomeUsersActivity.class);
+                    startActivity(setupProfile);
                 }
             });
         }

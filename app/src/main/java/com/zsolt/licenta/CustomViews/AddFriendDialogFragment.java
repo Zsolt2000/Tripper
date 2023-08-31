@@ -52,7 +52,7 @@ public class AddFriendDialogFragment extends AppCompatDialogFragment {
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
         setupRecyclerView(view);
-        builder.setView(view).setTitle("Invite friends").setNegativeButton("Cancel", (dialog, which) -> dismiss());
+        builder.setView(view).setTitle("Invite users").setNegativeButton("Cancel", (dialog, which) -> dismiss());
         return builder.create();
     }
 

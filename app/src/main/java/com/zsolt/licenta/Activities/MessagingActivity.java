@@ -16,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,12 +25,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.zsolt.licenta.Models.Chat;
-import com.zsolt.licenta.Models.ChatType;
-import com.zsolt.licenta.Models.NotificationType;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.Notifications.Data;
 import com.zsolt.licenta.Notifications.MyResponse;
 import com.zsolt.licenta.Notifications.NotificationSender;
+import com.zsolt.licenta.Notifications.NotificationType;
 import com.zsolt.licenta.Notifications.RetrofitClient;
 import com.zsolt.licenta.Notifications.TripperMessagingData;
 import com.zsolt.licenta.R;
@@ -110,7 +108,6 @@ public class MessagingActivity extends AppCompatActivity {
         hashMap.put("receiver", receiver);
         hashMap.put("message", message);
         hashMap.put("date", date);
-        hashMap.put("chatType", ChatType.SINGLE);
         databaseReference.child("Chats").push().setValue(hashMap).addOnSuccessListener(unused -> {
             editSendMessage.setText("");
             sendNotification(selectedUser.getDeviceToken(),currentUserUid);

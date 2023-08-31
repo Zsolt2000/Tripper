@@ -11,12 +11,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -24,12 +20,10 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.zsolt.licenta.Activities.MessagingActivity;
 import com.zsolt.licenta.Activities.TripActivity;
 import com.zsolt.licenta.Activities.UserProfileActivity;
-import com.zsolt.licenta.Models.NotificationType;
 import com.zsolt.licenta.Models.Trips;
 import com.zsolt.licenta.Models.Users;
 import com.zsolt.licenta.R;
 
-import java.io.Serializable;
 import java.util.Random;
 
 
@@ -49,7 +43,6 @@ public class TripperMessagingService extends FirebaseMessagingService {
             databaseReference = firebaseDatabase.getReference();
             databaseReference.child("Users").child(firebaseUser.getUid()).child("deviceToken").setValue(token);
         }
-
     }
 
     @Override
@@ -59,42 +52,87 @@ public class TripperMessagingService extends FirebaseMessagingService {
         notificationId=random.nextInt(9999-1000);
         notificationType = NotificationType.valueOf(remoteMessage.getData().get("notificationType"));
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        String destination = remoteMessage.getData().get("destination");
+        String messageData = remoteMessage.getData().get("messageData");
         if (firebaseUser != null) {
-            sendNotification(destination);
+            sendNotification(messageData);
         }
     }
 
-    private void sendNotification(String destination) {
+    private void sendNotification(String messageData) {
         firebaseDatabase = FirebaseDatabase.getInstance();
         databaseReference = firebaseDatabase.getReference();
         switch (notificationType) {
             case FRIEND_REQUEST:
-                databaseReference.child("Users").child(destination).get().addOnSuccessListener(dataSnapshot -> {
+                databaseReference.child("Users").child(messageData).get().addOnSuccessListener(dataSnapshot -> {
                     Users users = dataSnapshot.getValue(Users.class);
-                    createNotification(users);
+                    createFriendRequestNotification(users);
                 });
                 break;
             case NEW_TRIP:
-                databaseReference.child("Trips").child(destination).get().addOnSuccessListener(dataSnapshot -> {
+                databaseReference.child("Trips").child(messageData).get().addOnSuccessListener(dataSnapshot -> {
                     Trips trip = dataSnapshot.getValue(Trips.class);
-                    if (trip.getTitle().equals(destination)) {
-                        createNotification(trip.getCreator().getName(), trip.getTitle());
+                    if (trip.getTitle().equals(messageData)) {
+                        createTripInviteNotification(trip.getCreator().getName(), trip.getTitle());
 
                     }
                 });
                 break;
             case MESSAGE:
-                databaseReference.child("Users").child(destination).get().addOnSuccessListener(dataSnapshot -> {
+                databaseReference.child("Users").child(messageData).get().addOnSuccessListener(dataSnapshot -> {
                     Users users = dataSnapshot.getValue(Users.class);
                     createMessageNotification(users);
                 });
                 break;
+            case JOIN_TRIP:
+                databaseReference.child("Trips").child(messageData).get().addOnSuccessListener(dataSnapshot -> {
+                    Trips trip = dataSnapshot.getValue(Trips.class);
+                    if (trip.getTitle().equals(messageData)) {
+                        createJoinedTripNotification(trip.getTitle());
+
+                    }
+                });
             default:
                 Log.i("NOTIFICATION_SERVICE", "Unknown notification type");
                 break;
         }
 
+    }
+
+    private void createJoinedTripNotification(String title) {
+        Intent intent = new Intent(getApplicationContext(), TripActivity.class);
+        intent.putExtra("trip", title);
+        String channel_id = "joined_channel";
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent
+                = PendingIntent.getActivity(
+                getApplicationContext(), 0, intent,
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+        NotificationCompat.Builder builder
+                = new NotificationCompat
+                .Builder(getApplicationContext(),
+                channel_id)
+                .setSmallIcon(R.drawable.logo)
+                .setAutoCancel(true)
+                .setVibrate(new long[]{1000, 1000, 1000,
+                        1000, 1000})
+                .setOnlyAlertOnce(true)
+                .setContentIntent(pendingIntent)
+                .setContentTitle("User joined your trip")
+                .setContentText("A new user has joined your trip: "+title);
+        NotificationManager notificationManager
+                = (NotificationManager) getSystemService(
+                Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT
+                >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel
+                    = new NotificationChannel(
+                    channel_id, channel_id,
+                    NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(
+                    notificationChannel);
+        }
+
+        notificationManager.notify(notificationId, builder.build());
     }
 
     private void createMessageNotification(Users user) {
@@ -134,7 +172,7 @@ public class TripperMessagingService extends FirebaseMessagingService {
         notificationManager.notify(notificationId, builder.build());
     }
 
-    private void createNotification(Users user) {
+    private void createFriendRequestNotification(Users user) {
         Intent intent = new Intent(getApplicationContext(), UserProfileActivity.class);
         intent.putExtra("selectedUser", user);
         String channel_id = "friend_channel";
@@ -171,7 +209,7 @@ public class TripperMessagingService extends FirebaseMessagingService {
         notificationManager.notify(notificationId, builder.build());
     }
 
-    private void createNotification(String tripCreator, String tripTitle) {
+    private void createTripInviteNotification(String tripCreator, String tripTitle) {
         Intent intent = new Intent(getApplicationContext(), TripActivity.class);
         intent.putExtra("trip", tripTitle);
         String channel_id = "trip_channel";
