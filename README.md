@@ -1,4 +1,4 @@
-#Tripper
+# Tripper
 ## Tripper is a Android application in which a user can create events, modify their information and communicate with other users. It was developed in Java using Firebase as a back end service, Retrofit for networking and Google Maps Platform for implementing a map inside the application.
 ### Steps to set up the project:
 1. Clone the repository using your prefered IDE
