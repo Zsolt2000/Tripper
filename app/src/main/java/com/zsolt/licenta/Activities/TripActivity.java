@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,8 +71,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class TripActivity extends AppCompatActivity implements AddFriendsDialogListener {
-    private EditText editViewTripTitle, editViewTripLocation, editViewTripStartDate, editViewTripNumberOfPeople;
-    private TextView textViewTripVisibility;
+    private EditText editViewTripTitle, editViewTripLocation, editViewTripStartDate, editViewTripNumberOfPeople,editViewTripInformation;
+    private TextView textViewTripVisibility,textViewTripType,textViewInvitePeople;
     private Toolbar toolbar;
     private ActionBar actionBar;
     private ConstraintLayout constraintLayout;
@@ -91,6 +92,7 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
     private String currentTripTitle;
     private Users currentUser;
     private boolean isUserJoined;
+    private ScrollView scrollView;
 
 
     @Override
@@ -255,7 +257,7 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
                 setLayoutReadOnly((ViewGroup) child, focusable);
             } else if (child instanceof RecyclerView) {
                 continue;
-            } else if (child.getId() == R.id.edit_view_location) {
+            } else if (child.getId() == R.id.edit_view_location ||child.getId()==R.id.button_view_join_trip||child.getId()==R.id.button_view_delete_trip) {
                 continue;
             } else {
                 child.setEnabled(focusable);
@@ -286,6 +288,7 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
                         editViewTripNumberOfPeople.setText(String.valueOf(currentTrip.getNumberOfPeople()));
                         editViewTripStartDate.setText(currentTrip.getStartDate());
                         spinnerViewTripType.setSelection(currentTrip.getTripType().ordinal());
+                        editViewTripInformation.setText(currentTrip.getTripInformation());
                         if (currentTrip.getInvitedUsers() == null) {
                             invitedPeople = new ArrayList<>();
                         } else {
@@ -310,7 +313,6 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
                             buttonJoinTrip.setVisibility(View.VISIBLE);
                             addFriendsAdapter.setRemovable(false);
                         }
-
                         recyclerViewInvitedPeople.setLayoutManager(new LinearLayoutManager(TripActivity.this, LinearLayoutManager.VERTICAL, false));
                         recyclerViewInvitedPeople.setAdapter(addFriendsAdapter);
                     }
@@ -418,6 +420,10 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
         buttonDeleteTrip = findViewById(R.id.button_view_delete_trip);
         toolbar = findViewById(R.id.toolbar_trip);
         textViewTripVisibility = findViewById(R.id.text_view_trip_visibility);
+        editViewTripInformation=findViewById(R.id.edit_view_trip_information);
+        scrollView=findViewById(R.id.scrollView);
+        textViewTripType=findViewById(R.id.text_view_select_type);
+        textViewInvitePeople=findViewById(R.id.text_view_add_people);
     }
 
     @Override
@@ -428,18 +434,24 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
         menuItem.setActionView(R.layout.custom_settings_profile);
         buttonEditTrip = menuItem.getActionView().findViewById(R.id.profile_edit_button);
         buttonSaveTrip = menuItem.getActionView().findViewById(R.id.profile_save_button);
-        buttonDeleteTrip.setVisibility(View.GONE);
+        buttonDeleteTrip.setVisibility(View.INVISIBLE);
+        textViewInvitePeople.setVisibility(View.GONE);
+        textViewTripType.setVisibility(View.GONE);
         setLayoutReadOnly(constraintLayout, false);
         buttonEditTrip.setOnClickListener(v -> {
             buttonSaveTrip.setVisibility(View.VISIBLE);
             buttonDeleteTrip.setVisibility(View.VISIBLE);
+            textViewInvitePeople.setVisibility(View.VISIBLE);
+            textViewTripType.setVisibility(View.VISIBLE);
             isEditableLocation = true;
             setLayoutReadOnly(constraintLayout, true);
             addFriendsAdapter.setRemovable(true);
         });
         buttonSaveTrip.setOnClickListener(v -> {
             buttonSaveTrip.setVisibility(View.GONE);
-            buttonDeleteTrip.setVisibility(View.GONE);
+            buttonDeleteTrip.setVisibility(View.INVISIBLE);
+            textViewInvitePeople.setVisibility(View.INVISIBLE);
+            textViewTripType.setVisibility(View.INVISIBLE);
             setLayoutReadOnly(constraintLayout, false);
             isEditableLocation = false;
             updateTrip();
@@ -451,7 +463,7 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
     private boolean validTrip() {
         if (editViewTripTitle.getText().toString().isEmpty() ||
                 editViewTripLocation.getText().toString().isEmpty() ||
-                editViewTripStartDate.getText().toString().isEmpty() || addFriendsAdapter.getItemCount() < 0) {
+                editViewTripStartDate.getText().toString().isEmpty()||editViewTripInformation.getText().toString().isEmpty() || addFriendsAdapter.getItemCount() < 0) {
             Toast.makeText(this, "Please fill in the fields", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -471,6 +483,7 @@ public class TripActivity extends AppCompatActivity implements AddFriendsDialogL
             currentTrip.setNumberOfPeople(Integer.parseInt(editViewTripNumberOfPeople.getText().toString()));
             currentTrip.setPrivate(switchViewTripVisibility.isChecked());
             currentTrip.setInvitedUsers(addFriendsAdapter.getFriendsList());
+            currentTrip.setTripInformation(editViewTripInformation.getText().toString());
             HashMap<String, Object> updatedTrip = new HashMap<>();
             updatedTrip.put(currentTrip.getTitle(), currentTrip);
             databaseReference.child("Trips").updateChildren(updatedTrip, (error, ref) -> Toast.makeText(TripActivity.this, "Successfully saved the trip", Toast.LENGTH_SHORT).show());

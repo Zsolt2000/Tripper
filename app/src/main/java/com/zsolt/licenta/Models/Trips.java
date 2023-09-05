@@ -15,12 +15,11 @@ public class Trips implements Serializable,Parcelable{
     private int numberOfPeople;
     private String location;
     private List<Users> invitedUsers;
-
     private TripType tripType;
-
     private boolean isPrivate;
+    private String tripInformation;
 
-    public Trips(String title, Users creator, String startDate, int numberOfPeople, boolean isPrivate,String location, List<Users> invitedUsers,TripType triptype) {
+    public Trips(String title, Users creator, String startDate, int numberOfPeople, boolean isPrivate,String location, List<Users> invitedUsers,TripType triptype,String tripInformation) {
         this.title = title;
         this.creator = creator;
         this.startDate = startDate;
@@ -29,6 +28,7 @@ public class Trips implements Serializable,Parcelable{
         this.invitedUsers = invitedUsers;
         this.isPrivate=isPrivate;
         this.tripType=triptype;
+        this.tripInformation=tripInformation;
     }
     public Trips(){}
 
@@ -39,7 +39,13 @@ public class Trips implements Serializable,Parcelable{
         location = in.readString();
         isPrivate = in.readByte() != 0;
     }
+    public String getTripInformation() {
+        return tripInformation;
+    }
 
+    public void setTripInformation(String tripInformation) {
+        this.tripInformation = tripInformation;
+    }
 
     public String getTitle() {
         return title;

@@ -74,7 +74,7 @@ import retrofit2.Response;
 public class AddTripActivity extends AppCompatActivity implements AddFriendsDialogListener {
     private Toolbar toolbar;
     private ActionBar actionbar;
-    private EditText editTripTitle, editStartDate, editNumberOfPeople, editAddLocation;
+    private EditText editTripTitle, editStartDate, editNumberOfPeople, editAddLocation, editTripInformation;
     private Spinner spinnerTripType;
     private RecyclerView recyclerInvitedPeople;
     private SwitchCompat switchTripVisibility;
@@ -120,10 +120,11 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
                 String tripTitle = editTripTitle.getText().toString();
                 String tripLocation = editAddLocation.getText().toString();
                 String tripStartDate = editStartDate.getText().toString();
+                String tripInformation = editTripInformation.getText().toString();
                 boolean isPrivate = switchTripVisibility.isChecked();
                 int numberOfPeople = Integer.parseInt(editNumberOfPeople.getText().toString());
                 List<Users> invitedPeople = addFriendsAdapter.getFriendsList();
-                Trips trip = new Trips(tripTitle, currentUser, tripStartDate, numberOfPeople, isPrivate, tripLocation, invitedPeople, tripType);
+                Trips trip = new Trips(tripTitle, currentUser, tripStartDate, numberOfPeople, isPrivate, tripLocation, invitedPeople, tripType, tripInformation);
                 saveTrip(trip);
             }
         });
@@ -151,7 +152,7 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
     private boolean validTrip() {
         if (editTripTitle.getText().toString().isEmpty() ||
                 editAddLocation.getText().toString().isEmpty() ||
-                editStartDate.getText().toString().isEmpty() || addFriendsAdapter.getItemCount() < 0) {
+                editStartDate.getText().toString().isEmpty() || editTripInformation.getText().toString().isEmpty() || addFriendsAdapter.getItemCount() < 0) {
             Toast.makeText(this, "Please fill in the fields", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -180,7 +181,7 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
         databaseReference.child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
-           currentUser=dataSnapshot.getValue(Users.class);
+                currentUser = dataSnapshot.getValue(Users.class);
             }
         });
     }
@@ -319,6 +320,7 @@ public class AddTripActivity extends AppCompatActivity implements AddFriendsDial
         textTripVisibility = findViewById(R.id.text_view_trip_visibility);
         buttonAddTrip = findViewById(R.id.button_view_add_trip);
         buttonAddPeople = findViewById(R.id.button_view_add_people);
+        editTripInformation = findViewById(R.id.edit_trip_information);
     }
 
     private void setupToolbar() {

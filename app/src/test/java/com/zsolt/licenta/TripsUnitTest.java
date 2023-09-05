@@ -50,4 +50,12 @@ public class TripsUnitTest {
         trip.setPrivate(isTripPrivate);
         assertEquals(isTripPrivate,trip.isPrivate());
     }
+
+    @Test
+    public void assertTripInformationNotNull() {
+        trip = new Trips();
+        String tripInformation="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        trip.setTripInformation(tripInformation);
+        assertEquals(tripInformation,trip.getTripInformation());
+    }
 }
